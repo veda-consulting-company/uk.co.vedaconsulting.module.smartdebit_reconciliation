@@ -342,15 +342,17 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
   }//end of function
 
   function getSmartDebitPayments($referenceNumber) {
+    $paymentProcessorType = CRM_Core_PseudoConstant::paymentProcessorType(false, null, 'name');
+    $paymentProcessorTypeId = CRM_Utils_Array::key('Smart Debit', $paymentProcessorType);
   
       $sql  = " SELECT user_name ";
       $sql .= " ,      password ";
       $sql .= " ,      signature "; 
       $sql .= " FROM civicrm_payment_processor "; 
-      $sql .= " WHERE payment_processor_type = %1 "; 
+      $sql .= " WHERE payment_processor_type_id = %1 "; 
       $sql .= " AND is_test= %2 ";
 
-      $params = array( 1 => array( 'Smart Debit', 'String' )
+      $params = array( 1 => array( $paymentProcessorTypeId, 'Integer' )
                      , 2 => array( '0', 'Int' )    
                      );
 
