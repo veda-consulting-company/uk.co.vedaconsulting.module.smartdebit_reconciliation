@@ -4,12 +4,44 @@
 		
     <tr>
       <td>
-        Smart Debit Details
+        <b>Smart Debit Details
       </td>
-      <td>
-			<pre>{$SDMandateArray|@print_r:true}</pre>
-      </td>
+      
     </tr>
+        <tr>
+            <td class="label">{$form.first_name.label}</td>
+            <td>{$SDMandateArray.first_name}</td>
+        </tr>
+        <tr>
+            <td class="label">{$form.last_name.label}</td>
+            <td>{$SDMandateArray.last_name}</td>
+        </tr>
+        <tr>
+            <td class="label">{$form.email_address.label}</td>
+            <td>{$SDMandateArray.email_address}</td>
+        </tr>
+        <tr>
+            <td class="label">{$form.regular_amount.label}</td>
+            <td>{$SDMandateArray.regular_amount}</td>
+        </tr>
+        <tr>
+            <td class="label">{$form.start_date.label}</td>
+            <td>{$SDMandateArray.start_date}</td>
+        </tr>
+        <tr>
+            <td>{ts}Address{/ts}</td>
+            <td>
+            <span>{$SDMandateArray.address_1}</span><br>
+                {if $SDMandateArray.address_2}<span>{$SDMandateArray.address_2}</span><br>{/if}
+                {if $SDMandateArray.address_3}<span>{$SDMandateArray.address_3}</span><br>{/if}
+                <span>{$SDMandateArray.town}</span><br>
+                {if $SDMandateArray.county}<span>{$SDMandateArray.county}</span><br>{/if}
+                <span>{$SDMandateArray.postcode}</span><br>
+            
+            </td>
+        </tr>
+        
+        
     <tr>
       <td>
         {$form.reference_number.label} 

@@ -33,6 +33,19 @@ class CRM_SmartdebitReconciliation_Form_MembershipRecurDetails extends CRM_Core_
 		 require_once 'CRM/SmartdebitReconciliation/Form/SmartdebitReconciliationList.php';
      $smartDebitResponse = CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList::getSmartDebitPayments(CRM_Utils_Array::value('reference_number', $_GET));
 		 $smartDebitMandate = $smartDebitResponse[0];
+     
+     // Display the smart debit payments details 
+       $el = $this->addElement('text', 'first_name', 'First Name', array('size' => 50, 'maxlength' => 255));
+       $el->freeze();
+       $el = $this->addElement('text', 'last_name', 'Last Name',array('size' => 50, 'maxlength' => 255));
+       $el->freeze();
+       $el = $this->addElement('text', 'email_address', 'Email Address', array('size' => 50, 'maxlength' => 255));
+       $el->freeze();
+       $el = $this->addElement('text', 'regular_amount', 'Amount', array('size' => 50, 'maxlength' => 255));
+       $el->freeze();
+       $el = $this->addElement('text', 'start_date', 'Start Date', array('size' => 50, 'maxlength' => 255));
+       $el->freeze();
+
 		 $this->assign( 'SDMandateArray', $smartDebitMandate );
 
 		parent::buildQuickForm();

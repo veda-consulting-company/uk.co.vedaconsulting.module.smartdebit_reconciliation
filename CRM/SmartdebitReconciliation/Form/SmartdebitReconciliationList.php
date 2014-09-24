@@ -85,7 +85,11 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
      * @return void
      */
     function buildQuickForm( ) {
-
+      
+      // FOr smart debit sync purpose
+        $sync = CRM_Utils_Array::value('sync', $_GET, '');
+        $this->assign('sync', $sync);
+        
         require_once 'CRM/Core/Config.php';
         $config = CRM_Core_Config::singleton();
         
@@ -131,6 +135,8 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
             $params = array( 1 => array( $smartDebitRecord['reference_number'], 'String' ) );
             $dao = CRM_Core_DAO::executeQuery( $sql, $params);
 
+            // Remove first 2 characters (Ascii characters 194 & 163)
+            $regularAmount = substr($smartDebitRecord['regular_amount'], 2);
             if ($dao->fetch()) {
                 // Smart Debit Record Found
                 // 1. Transaction Id in Smart Debit and Civi for the same contact
@@ -141,8 +147,6 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
                 $separator = '';
                 $separatorCharacter = ' | ';
 
-                // Remove first 2 characters (Ascii characters 194 & 163)
-                $regularAmount = substr($smartDebitRecord['regular_amount'], 2);
 
 								if (CRM_Utils_Array::value('checkAmount', $_GET)) {
 									if ($regularAmount != $dao->amount) {
@@ -207,10 +211,11 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
 
                 // If different then
                 if ($different) {
+                  $financialType  = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $dao->financial_type_id, 'name', 'id');
 
                     $listArray[$key]['recordFound']           = $transactionRecordFound;
                     $listArray[$key]['contribution_recur_id'] = $dao->contribution_recur_id;
-                    $listArray[$key]['contribution_type']     = $dao->contribution_type;
+                    $listArray[$key]['contribution_type']     = $financialType;
                     $listArray[$key]['contact_id']            = $dao->contact_id;
                     $listArray[$key]['sd_contact_id']         = $smartDebitRecord['payerReference'];
                     $listArray[$key]['contact_name']          = $dao->display_name;
@@ -272,6 +277,8 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
 									$listArray[$key]['sd_frequency']							= $smartDebitRecord['frequency_type'];
 									$listArray[$key]['sd_amount']									= $regularAmount;
 									$listArray[$key]['sd_contribution_status_id'] = $smartDebitRecord['current_state'];
+                  $listArray[$key]['transaction_id']            = $smartDebitRecord['reference_number'];
+                  $listArray[$key]['sd_frequency']              = $smartDebitRecord['frequency_type'];
 
 							  }
             }
@@ -321,9 +328,12 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
 				$newListArray = array();
 				$newListCounter = 0;
 				foreach ($listArray as $key => $listArrayRec) {
+          /*
 					if ($newListCounter > 199) { 
 						break;
 					}
+           * 
+           */
 					$newListArray[$key] = $listArrayRec;
 					$newListCounter++;
 				}
@@ -655,6 +665,19 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
       //print_r($params);
 
       $recurResult = civicrm_api("ContributionRecur","create", $recurParams);
+      
+      // Populate the membership id on repair recur
+      $params['contribution_recur_id'] = $recurResult['id'];
+      
+      if( $params['contribution_recur_id'] && $params['membership_id']) {
+        $query = "
+            UPDATE civicrm_contribution_recur
+            SET membership_id = %1
+            WHERE id = %2 ";
+
+        $params = array( 1 => array( $params['membership_id'], 'Int' ), 2 => array($params['contribution_recur_id'], 'Int') );
+        $dao = CRM_Core_DAO::executeQuery($query, $params);
+      }
     }
     
     /* This is used when we need to create a new recurring record
@@ -701,8 +724,18 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
       //print_r($params);
 
       $recurResult = civicrm_api("ContributionRecur","create", $recurParams);
-
+      
       $params['contribution_recur_id'] = $recurResult['id'];
+      // // Populate the membership id on create recur
+      if( $params['contribution_recur_id'] && $params['membership_id'] ) {
+        $query = "
+            UPDATE civicrm_contribution_recur
+            SET membership_id = %1
+            WHERE id = %2 ";
+
+        $params = array( 1 => array( $params['membership_id'], 'Int' ), 2 => array($params['contribution_recur_id'], 'Int') );
+        $dao = CRM_Core_DAO::executeQuery($query, $params);
+      }
       //print_r($recurResult);
     }
 

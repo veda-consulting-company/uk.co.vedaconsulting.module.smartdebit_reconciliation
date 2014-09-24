@@ -23,6 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{if $sync eq 0}
 <p>
 <a href="/civicrm/smartdebit/reconciliation/list?checkMissingFromCivi=1">Show All Mandates Missing from CiviCRM</a><br />
 <a href="/civicrm/smartdebit/reconciliation/list?checkMissingFromSD=1">Show All Mandates Missing from Smart Debit</a><br />
@@ -31,13 +32,14 @@
 <a href="/civicrm/smartdebit/reconciliation/list?checkStatus=1">Show All Mandates with Differing Status</a><br />
 <a href="/civicrm/smartdebit/reconciliation/list?checkPayerReference=1">Show All Mandates with missing Contact ID from CiviCRM</a><br />
 </p>
-<h3>{ts}Mis-Matched Contacts (Limited to 200 Records){/ts}</h3>
+{/if}
+<h3>{ts}Mis-Matched Contacts {*(Limited to 200 Records)*}{/ts}</h3>
 <div style="min-height:400px;"> 
         
     <table class="selector">
         <tr style="background-color: #CDE8FE;">
            <td><b>{ts}Transaction ID{/ts}</td>
-           <td><b>{ts}Type{/ts}</b></td>
+           {if $row.contribution_recur_id }<td><b>{ts}Type{/ts}</b></td>{/if}
            <td><b>{ts}Contact{/ts}</td>
            <td><b>{ts}Differences{/ts}</td>
 {*           <td><b>{ts}Payment Instrument{/ts}</td>*}
@@ -51,22 +53,34 @@
             {assign var=id value=$row.id} 
             <tr>
                 <td>
-									<a href="/civicrm/contact/view/contributionrecur?id={$row.contribution_recur_id}">{$row.transaction_id}</a>
-								</td>
+		{if $row.contribution_recur_id }
+                    <a href="/civicrm/contact/view/contributionrecur?id={$row.contribution_recur_id}">{$row.transaction_id}</a>
+                {else}
+                    {$row.transaction_id}
+                {/if}
+                </td>
+                {if $row.contribution_recur_id }
                 <td>{$row.contribution_type}</td>
+                {/if}
                 <td>
-								{if $row.contact_id gt 0}
-									<a href="/civicrm/contact/view?cid={$row.contact_id}">{$row.contact_name}</a>
-							  {else}
-									{$row.contact_name}
-								{/if}
+                {if $row.contact_id gt 0}
+                    <a href="/civicrm/contact/view?cid={$row.contact_id}">{$row.contact_name}</a>
+                {else}
+                    {$row.contact_name}
+                {/if}
 								</td>
                 <td>{$row.differences}</td>
 {*                <td>{$row.payment_instrument}</td>*}
 {*                <td>{$row.start_date|crmDate}/{$row.sd_start_date|crmDate}</td>*}
-                <td>{$row.frequency}/{$row.sd_frequency}</td>
-                <td>{$row.amount}/{$row.sd_amount}</td>
-                <td>{$row.contribution_status_id}/{$row.sd_contribution_status_id}</td>
+                {if $row.contribution_recur_id }
+                    <td>{$row.frequency}/{$row.sd_frequency}</td>
+                    <td>{$row.amount}/{$row.sd_amount}</td>
+                    <td>{$row.contribution_status_id}/{$row.sd_contribution_status_id}</td>
+                {else}
+                    <td>{$row.sd_frequency}</td>
+                    <td>{$row.sd_amount}</td>
+                    <td>{$row.sd_contribution_status_id}</td>  
+                {/if}
 								<td>
                 {if $row.recordFound}
                     <a href="/civicrm/contact/view/contributionrecur?id={$row.contribution_recur_id}&action=update">Edit</a>
