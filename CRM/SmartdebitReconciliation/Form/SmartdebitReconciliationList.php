@@ -237,7 +237,9 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
 
             }
             else {
-								if (CRM_Utils_Array::value('checkMissingFromCivi', $_GET) && ($smartDebitRecord['current_state'] == 10 || $smartDebitRecord['current_state'] == 1)) {
+								//if (CRM_Utils_Array::value('checkMissingFromCivi', $_GET) && ($smartDebitRecord['current_state'] == 10 || $smartDebitRecord['current_state'] == 1)) {
+              // For sync purpose: We have to show the Rejected smart debit here, then only we could fix the recur and could display the details under the rejected payments.
+								if (CRM_Utils_Array::value('checkMissingFromCivi', $_GET)) {
 
 									$listArray[$key]['fix_me_url']								= '/civicrm/smartdebit/reconciliation/fixmissingcivi?reference_number='.$smartDebitRecord['reference_number'];									
 
