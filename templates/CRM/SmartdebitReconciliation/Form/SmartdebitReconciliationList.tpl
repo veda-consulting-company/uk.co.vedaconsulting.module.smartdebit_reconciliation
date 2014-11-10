@@ -36,7 +36,7 @@
 <h3>{ts}Mis-Matched Contacts {*(Limited to 200 Records)*}{/ts}</h3>
 <div style="min-height:400px;"> 
         
-    <table class="selector">
+    <table  class="selector row-highlight">
         <tr style="background-color: #CDE8FE;">
            <td><b>{ts}Transaction ID{/ts}</td>
            {if $row.contribution_recur_id }<td><b>{ts}Type{/ts}</b></td>{/if}
@@ -51,7 +51,7 @@
 
         {foreach from=$listArray item=row}
             {assign var=id value=$row.id} 
-            <tr>
+            <tr class="{cycle values="odd-row,even-row"}">
                 <td>
 		{if $row.contribution_recur_id }
                     <a href="/civicrm/contact/view/contributionrecur?id={$row.contribution_recur_id}">{$row.transaction_id}</a>

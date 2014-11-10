@@ -237,9 +237,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
 
             }
             else {
-								//if (CRM_Utils_Array::value('checkMissingFromCivi', $_GET) && ($smartDebitRecord['current_state'] == 10 || $smartDebitRecord['current_state'] == 1)) {
-              // For sync purpose: We have to show the Rejected smart debit here, then only we could fix the recur and could display the details under the rejected payments.
-								if (CRM_Utils_Array::value('checkMissingFromCivi', $_GET)) {
+								if (CRM_Utils_Array::value('checkMissingFromCivi', $_GET) && ($smartDebitRecord['current_state'] == 10 || $smartDebitRecord['current_state'] == 1)) {
 
 									$listArray[$key]['fix_me_url']								= '/civicrm/smartdebit/reconciliation/fixmissingcivi?reference_number='.$smartDebitRecord['reference_number'];									
 
@@ -599,7 +597,8 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
         $params['payment_processor_id'] = self::getSmartDebitPaymentProcessorID();
         $params['payment_instrument_id'] = UK_Direct_Debit_Form_Main::getDDPaymentInstrumentID();
         $params['trxn_id'] = $params['payer_reference'];
-        $params['cycle_day'] = 99;
+        list($y, $m, $d) = explode('-', $smartDebitRecord['start_date']);
+        $params['cycle_day'] = $d;
 
 				// First Check if a recurring record has beeen selected
         if ((!isset($params['contribution_recur_id']) || empty($params['contribution_recur_id']))) {
@@ -672,13 +671,16 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
       $params['contribution_recur_id'] = $recurResult['id'];
       
       if( $params['contribution_recur_id'] && $params['membership_id']) {
-        $query = "
-            UPDATE civicrm_contribution_recur
-            SET membership_id = %1
-            WHERE id = %2 ";
+        $columnExists = CRM_Core_DAO::checkFieldExists('civicrm_contribution_recur', 'membership_id');
+          if($columnExists) {
+            $query = "
+                UPDATE civicrm_contribution_recur
+                SET membership_id = %1
+                WHERE id = %2 ";
 
-        $params = array( 1 => array( $params['membership_id'], 'Int' ), 2 => array($params['contribution_recur_id'], 'Int') );
-        $dao = CRM_Core_DAO::executeQuery($query, $params);
+            $params = array( 1 => array( $params['membership_id'], 'Int' ), 2 => array($params['contribution_recur_id'], 'Int') );
+            $dao = CRM_Core_DAO::executeQuery($query, $params);
+          }
       }
     }
     
@@ -730,13 +732,16 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
       $params['contribution_recur_id'] = $recurResult['id'];
       // // Populate the membership id on create recur
       if( $params['contribution_recur_id'] && $params['membership_id'] ) {
-        $query = "
-            UPDATE civicrm_contribution_recur
-            SET membership_id = %1
-            WHERE id = %2 ";
+        $columnExists = CRM_Core_DAO::checkFieldExists('civicrm_contribution_recur', 'membership_id');
+          if($columnExists) {
+            $query = "
+                UPDATE civicrm_contribution_recur
+                SET membership_id = %1
+                WHERE id = %2 ";
 
-        $params = array( 1 => array( $params['membership_id'], 'Int' ), 2 => array($params['contribution_recur_id'], 'Int') );
-        $dao = CRM_Core_DAO::executeQuery($query, $params);
+            $params = array( 1 => array( $params['membership_id'], 'Int' ), 2 => array($params['contribution_recur_id'], 'Int') );
+            $dao = CRM_Core_DAO::executeQuery($query, $params);
+          }
       }
       //print_r($recurResult);
     }
