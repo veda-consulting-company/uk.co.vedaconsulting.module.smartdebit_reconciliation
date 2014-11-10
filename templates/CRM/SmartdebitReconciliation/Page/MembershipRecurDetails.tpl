@@ -1,8 +1,8 @@
 <h3>{ts}View Contact Details, Membership and Contribution Recur{/ts}</h3>
-<div>
+<div class="crm-form-block">
   <table>
     <tr>
-      <td>
+      <td width="30%">
         Smart Debit Reference :
       </td>
       <td>
@@ -110,5 +110,7 @@
       
 </div>
 <div>
+    <span class="crm-button crm-button-type-upload crm-button_qf_ContactDetails_upload">
   <input type="submit" name="submit" value="Submit" onclick="parent.location='/civicrm/smartdebit/reconciliation/fix-contact-rec?cid={$aContact.id}&mid={$aMembership.id}&cr_id={$aContributionRecur.id}&reference_number={$reference_number}'"/>
+    </span>
 </div>

@@ -83,3 +83,27 @@ function smartdebit_civicrm_managed(&$entities) {
   return _smartdebit_civix_civicrm_managed($entities);
 }
 
+function smartdebit_civicrm_navigationMenu( &$params ) {
+    #Get the maximum key of $params
+    $maxKey = max(array_keys($params)); 
+		
+    #set settings navigation Id 
+    $sdReconciliationId = $maxKey+1;
+    
+    #set navigation menu
+	$parentId         = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Navigation', 'Administer', 'id', 'name');
+	$civiContributeId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Navigation', 'CiviContribute', 'id', 'name');
+  $params[$parentId]['child'][$civiContributeId]['child'][$sdReconciliationId]= array(
+                          'attributes' => array (
+                                            'label'      => 'Smart Debit Reconciliation',
+                                            'name'       => 'Smart Debit Reconciliation',
+                                            'url'        => 'civicrm/smartdebit/reconciliation/list?reset=1',
+                                            'permission' => 'administer CiviCRM',
+                                            'operator'   => null,
+                                            'separator'  => null,
+                                            'parentID'   => $parentId,
+                                            'navID'      => $sdReconciliationId,
+                                            'active'     => 1
+                                            )
+                        );
+}
