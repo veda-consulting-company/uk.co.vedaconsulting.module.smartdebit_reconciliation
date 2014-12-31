@@ -91,7 +91,7 @@
   </style>
   <script type="text/javascript">
     {literal}
-      
+      var memStatusCurrent = {/literal}"{$memStatusCurrent}"{literal}; //MV assigned the memership Status Name 'Current' as constant
       var contactUrl = {/literal}"{crmURL p='civicrm/ajax/rest' q='className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=navigation' h=0 }"{literal};
       var getTemplateContentUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_SmartdebitReconciliation_Page_AJAX&fnName=getMembershipByContactID&json=1'}"{literal}  
       cj( '#contact_name' ).autocomplete( contactUrl, {
@@ -126,6 +126,12 @@
                       value: memID,
                       text : text 
                      }));
+                    //MV to set the current membership as default
+                    var temp = text.split('/');
+                    if( temp[1] == memStatusCurrent ){
+                      cj('#membership_record option[value='+memID+']').attr('selected', true);
+                    }
+                    //end
                   });
                   }
                  if(key == "cRecur"){

@@ -1,6 +1,7 @@
 <?php
 require_once 'CRM/SmartdebitReconciliation/Utils.php';
 class CRM_SmartdebitReconciliation_Form_MembershipRecurDetails extends CRM_Core_Form{
+  CONST c_current_membership_status = "Current"; // MV, to set current membership as default 
   function preProcess() {
     parent::preProcess();
   }
@@ -46,7 +47,8 @@ class CRM_SmartdebitReconciliation_Form_MembershipRecurDetails extends CRM_Core_
        $el = $this->addElement('text', 'start_date', 'Start Date', array('size' => 50, 'maxlength' => 255));
        $el->freeze();
 
-		 $this->assign( 'SDMandateArray', $smartDebitMandate );
+     $this->assign( 'SDMandateArray', $smartDebitMandate );
+		 $this->assign( 'memStatusCurrent', self::c_current_membership_status ); //MV, to set the current membership as default, when ajax loading
 
 		parent::buildQuickForm();
   }
