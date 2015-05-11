@@ -381,7 +381,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
     
     // Restrict to a single payer if we have a reference
     if ($referenceNumber) {
-      $url .= "&query[reference_number]=$referenceNumber";
+      $url .= "&query[reference_number]=".rawurlencode($referenceNumber);
     }
 		
     $response = self::requestPost( $url, $username, $password );    
