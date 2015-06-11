@@ -85,6 +85,10 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
      * @return void
      */
     function buildQuickForm( ) {
+      // KJ 11/06/2015 To avoid get all records from smart debit when page loads by default
+      if (empty(CRM_Utils_Array::value('runSmartDebitList', $_GET))) {
+        return FALSE;
+      }
       
       // FOr smart debit sync purpose
         $sync = CRM_Utils_Array::value('sync', $_GET, '');

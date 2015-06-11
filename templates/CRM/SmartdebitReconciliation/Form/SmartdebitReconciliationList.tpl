@@ -25,12 +25,13 @@
 *}
 {if $sync eq 0}
 <p>
-<a href="/civicrm/smartdebit/reconciliation/list?checkMissingFromCivi=1">Show All Mandates Missing from CiviCRM</a><br />
-<a href="/civicrm/smartdebit/reconciliation/list?checkMissingFromSD=1">Show All Mandates Missing from Smart Debit</a><br />
-<a href="/civicrm/smartdebit/reconciliation/list?checkAmount=1">Show All Mandates with Differing Amounts</a><br />
-<a href="/civicrm/smartdebit/reconciliation/list?checkFrequency=1">Show All Mandates with Differing Frequencies</a><br />
-<a href="/civicrm/smartdebit/reconciliation/list?checkStatus=1">Show All Mandates with Differing Status</a><br />
-<a href="/civicrm/smartdebit/reconciliation/list?checkPayerReference=1">Show All Mandates with missing Contact ID from CiviCRM</a><br />
+<a href="/civicrm/smartdebit/reconciliation/list?runSmartDebitList=1">Run Smart Debit List</a><br />
+<a href="/civicrm/smartdebit/reconciliation/list?runSmartDebitList=1&checkMissingFromCivi=1">Show All Mandates Missing from CiviCRM</a><br />
+<a href="/civicrm/smartdebit/reconciliation/list?runSmartDebitList=1&checkMissingFromSD=1">Show All Mandates Missing from Smart Debit</a><br />
+<a href="/civicrm/smartdebit/reconciliation/list?runSmartDebitList=1&checkAmount=1">Show All Mandates with Differing Amounts</a><br />
+<a href="/civicrm/smartdebit/reconciliation/list?runSmartDebitList=1&checkFrequency=1">Show All Mandates with Differing Frequencies</a><br />
+<a href="/civicrm/smartdebit/reconciliation/list?runSmartDebitList=1&checkStatus=1">Show All Mandates with Differing Status</a><br />
+<a href="/civicrm/smartdebit/reconciliation/list?runSmartDebitList=1&checkPayerReference=1">Show All Mandates with missing Contact ID from CiviCRM</a><br />
 </p>
 {/if}
 <h3>{ts}Mis-Matched Contacts {*(Limited to 200 Records)*}{/ts}</h3>
