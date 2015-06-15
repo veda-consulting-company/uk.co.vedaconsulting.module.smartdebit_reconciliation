@@ -351,7 +351,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
           $totalRows = CRM_Core_DAO::singleValueQuery( $query );
 				}
         if (CRM_Utils_Array::value('checkMissingFromCivi', $_GET) || CRM_Utils_Array::value('checkMissingFromSD', $_GET)) {
-          $title = 'Found '.count($listArray).' of '.$totalRows.' Difference(s)';
+          $title = 'Showing '.count($listArray).' of '.$totalRows.' Difference(s)';
         } else {
           $title = 'Found '.count($listArray).' Difference(s)';
         }
