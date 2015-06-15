@@ -85,6 +85,10 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
      * @return void
      */
     function buildQuickForm( ) {
+      // KJ 11/06/2015 To avoid get all records from smart debit when page loads by default
+      if (CRM_Utils_Array::value('runSmartDebitRefresh', $_GET)) {
+        $insertSmartDebit = self::insertSmartDebitToTable();
+      }
       
       // FOr smart debit sync purpose
         $sync = CRM_Utils_Array::value('sync', $_GET, '');
@@ -94,8 +98,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
         $config = CRM_Core_Config::singleton();
         
         $transactionIdList = "'dummyId'";  //Initialised so have at least one entry in list
-  
-        $smartDebitArray = self::getSmartDebitPayments();
+        //$smartDebitArray = self::getSmartDebitPayments();
         $listArray = array();
         
         // The following differences are highlighted
@@ -103,13 +106,15 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
         // 2. Transaction Id in Smart Debit and Civi for different contacts
         // 3. Transaction Id in Smart Debit but none found in Civi
         // 4. Transaction Id in Civi but none in Smart Debit
-
+        
 				// Loop through Contributions and Highlight Discrepencies
-        foreach ($smartDebitArray as $key => $smartDebitRecord) {
+        //foreach ($smartDebitArray as $key => $smartDebitRecord) {
 
             // Start Here
-            $transactionIdList .= ", '".$smartDebitRecord['reference_number']."' "; // Transaction ID
-
+          if (CRM_Utils_Array::value('checkAmount', $_GET) || 
+              CRM_Utils_Array::value('checkFrequency', $_GET) ||
+              CRM_Utils_Array::value('checkStatus', $_GET) ||
+              CRM_Utils_Array::value('checkPayerReference', $_GET) ) {
             $group_name = "CiviCRM Preferences";
 
             $sql  = " SELECT ctrc.id contribution_recur_id ";
@@ -123,21 +128,29 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
             $sql .= " , ctrc.contribution_status_id ";
             $sql .= " , ctrc.frequency_unit ";
             $sql .= " , ctrc.frequency_interval ";
+            $sql .= " , ctrc.financial_type_id ";
+            $sql .= " , csd.regular_amount ";
+            $sql .= " , csd.frequency_type ";
+            $sql .= " , csd.current_state ";
+            $sql .= " , csd.payerReference ";
+            $sql .= " , csd.start_date as smart_debit_start_date ";
+            $sql .= " , csd.reference_number ";
+            $sql .= " , csd.id as smart_debit_id";
             $sql .= " FROM ";
             $sql .= " civicrm_contribution_recur ctrc ";
             $sql .= " LEFT JOIN civicrm_contact cont ON (ctrc.contact_id = cont.id) ";
             $sql .= " LEFT JOIN civicrm_option_value opva ON (ctrc.payment_instrument_id = opva.value) ";
             $sql .= " LEFT JOIN civicrm_option_group opgr ON (opgr.id = opva.option_group_id) ";
+            $sql .= " INNER JOIN civicrm_sd_refresh csd ON csd.reference_number = ctrc.trxn_id ";
             $sql .= " WHERE opgr.name = 'payment_instrument' ";
             $sql .= " AND   opva.label = 'Direct Debit' ";
-            $sql .= " AND ctrc.trxn_id = %1 ";
 
-            $params = array( 1 => array( $smartDebitRecord['reference_number'], 'String' ) );
-            $dao = CRM_Core_DAO::executeQuery( $sql, $params);
+            $dao = CRM_Core_DAO::executeQuery( $sql);
 
             // Remove first 2 characters (Ascii characters 194 & 163)
-            $regularAmount = substr($smartDebitRecord['regular_amount'], 2);
-            if ($dao->fetch()) {
+            while ($dao->fetch()) {
+              //$transactionIdList .= ", '".$dao->reference_number."' "; // Transaction ID
+              $regularAmount = substr($dao->regular_amount, 2);
                 // Smart Debit Record Found
                 // 1. Transaction Id in Smart Debit and Civi for the same contact
 
@@ -157,17 +170,17 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
 								}
 								
 								if (CRM_Utils_Array::value('checkFrequency', $_GET)) {
-									if ($smartDebitRecord['frequency_type'] == 'M' && $dao->frequency_unit != 'month' ) {
+									if ($dao->frequency_type == 'M' && $dao->frequency_unit != 'month' ) {
 											$different = true;
 											$differences .= 'Frequency';
 											$separator = $separatorCharacter;
 									}
-									if ($smartDebitRecord['frequency_type'] == 'Y' && $dao->frequency_unit != 'year' ) {
+									if ($dao->frequency_type == 'Y' && $dao->frequency_unit != 'year' ) {
 											$different = true;
 											$differences .= 'Frequency';
 											$separator = $separatorCharacter;
 									}
-									if ($smartDebitRecord['frequency_type'] == 'Q' && ($dao->frequency_unit != 'month' || $dao->frequency_interval != '3')) {
+									if ($dao->frequency_type == 'Q' && ($dao->frequency_unit != 'month' || $dao->frequency_interval != '3')) {
 											$different = true;
 											$differences .= 'Frequency';
 											$separator = $separatorCharacter;
@@ -193,7 +206,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
 								 */
 								// First case check if Smart Debit is new or livet then CiviCRM is in progress
 								if (CRM_Utils_Array::value('checkStatus', $_GET)) {
-									if (($smartDebitRecord['current_state'] == 10 || $smartDebitRecord['current_state'] == 1) && ($dao->contribution_status_id != 5)) {
+									if (($dao->current_state == 10 || $dao->current_state == 1) && ($dao->contribution_status_id != 5)) {
 											$different = true;
 											$differences .= $separator. 'Status';
 											$separator = $separatorCharacter;
@@ -202,7 +215,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
 								
                 // 2. Transaction Id in Smart Debit and Civi for different contacts
 								if (CRM_Utils_Array::value('checkPayerReference', $_GET)) {
-									if ($smartDebitRecord['payerReference'] != $dao->contact_id) {
+									if ($dao->payerReference != $dao->contact_id) {
 											$different = true;
 											$differences .= $separator. 'Payer Reference';
 											$separator = $separatorCharacter;
@@ -211,85 +224,96 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
 
                 // If different then
                 if ($different) {
-                  $financialType  = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $dao->financial_type_id, 'name', 'id');
+                  $financialType = '';
+                  if ($dao->financial_type_id) {
+                    $financialType  = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $dao->financial_type_id, 'name', 'id');
+                  }
 
-                    $listArray[$key]['recordFound']           = $transactionRecordFound;
-                    $listArray[$key]['contribution_recur_id'] = $dao->contribution_recur_id;
-                    $listArray[$key]['contribution_type']     = $financialType;
-                    $listArray[$key]['contact_id']            = $dao->contact_id;
-                    $listArray[$key]['sd_contact_id']         = $smartDebitRecord['payerReference'];
-                    $listArray[$key]['contact_name']          = $dao->display_name;
-                    $listArray[$key]['payment_instrument']    = $dao->payment_instrument;
-                    $listArray[$key]['start_date']            = $dao->start_date;
-                    $listArray[$key]['sd_start_date']         = $smartDebitRecord['start_date'];
-                    $listArray[$key]['frequency']             = $dao->frequency_unit;
-                    $listArray[$key]['sd_frequency']          = $smartDebitRecord['frequency_type'];
-                    $listArray[$key]['amount']                = $dao->amount;
-                    $listArray[$key]['sd_amount']             = $regularAmount;
-                    $listArray[$key]['contribution_status_id']    = $dao->contribution_status_id;
-                    $listArray[$key]['sd_contribution_status_id'] = $smartDebitRecord['current_state'];
-                    $listArray[$key]['transaction_id']        = $dao->trxn_id;
-                    $listArray[$key]['differences']           = $differences;
+                  $listArray[$dao->smart_debit_id]['recordFound']           = $transactionRecordFound;
+                  $listArray[$dao->smart_debit_id]['contribution_recur_id'] = $dao->contribution_recur_id;
+                  $listArray[$dao->smart_debit_id]['contribution_type']     = $financialType;
+                  $listArray[$dao->smart_debit_id]['contact_id']            = $dao->contact_id;
+                  $listArray[$dao->smart_debit_id]['sd_contact_id']         = $dao->payerReference;
+                  $listArray[$dao->smart_debit_id]['contact_name']          = $dao->display_name;
+                  $listArray[$dao->smart_debit_id]['payment_instrument']    = $dao->payment_instrument;
+                  $listArray[$dao->smart_debit_id]['start_date']            = $dao->start_date;
+                  $listArray[$dao->smart_debit_id]['sd_start_date']         = $dao->smart_debit_start_date;
+                  $listArray[$dao->smart_debit_id]['frequency']             = $dao->frequency_unit;
+                  $listArray[$dao->smart_debit_id]['sd_frequency']          = $dao->frequency_type;
+                  $listArray[$dao->smart_debit_id]['amount']                = $dao->amount;
+                  $listArray[$dao->smart_debit_id]['sd_amount']             = $regularAmount;
+                  $listArray[$dao->smart_debit_id]['contribution_status_id']    = $dao->contribution_status_id;
+                  $listArray[$dao->smart_debit_id]['sd_contribution_status_id'] = $dao->current_state;
+                  $listArray[$dao->smart_debit_id]['transaction_id']        = $dao->trxn_id;
+                  $listArray[$dao->smart_debit_id]['differences']           = $differences;
 //print_r($smartDebitRecord);
 //print_r($dao);
 //die;
                 }
-
             }
-            else {
-								if (CRM_Utils_Array::value('checkMissingFromCivi', $_GET) && ($smartDebitRecord['current_state'] == 10 || $smartDebitRecord['current_state'] == 1)) {
 
-									$listArray[$key]['fix_me_url']								= '/civicrm/smartdebit/reconciliation/fixmissingcivi?reference_number='.$smartDebitRecord['reference_number'];									
+          }
+          //else {
+          if (CRM_Utils_Array::value('checkMissingFromCivi', $_GET)) {
 
-									// 3. Transaction Id in Smart Debit but none found in Civi                
-									$sql  = " SELECT cont.id ";
-									$sql .= " ,      cont.display_name ";
-									$sql .= " FROM civicrm_contact cont "; 
-									$sql .= " WHERE cont.id = %1 ";
+            // 3. Transaction Id in Smart Debit but none found in Civi                
+            $sql  = " SELECT SQL_CALC_FOUND_ROWS cont.id as contact_id ";
+            $sql .= " , cont.display_name ";
+            $sql .= " , csd1.regular_amount ";
+            $sql .= " , csd1.frequency_type ";
+            $sql .= " , csd1.current_state ";
+            $sql .= " , csd1.payerReference ";
+            $sql .= " , csd1.start_date ";
+            $sql .= " , csd1.reference_number ";
+            $sql .= " , csd1.id as smart_debit_id";
+            $sql .= " , csd1.first_name";
+            $sql .= " , csd1.last_name";
+            $sql .= " FROM civicrm_sd_refresh csd1"; 
+            $sql .= " LEFT JOIN civicrm_contribution_recur ctrc ON ctrc.trxn_id = csd1.reference_number";
+            $sql .= " LEFT JOIN civicrm_contact cont ON cont.id = csd1.payerReference";                  
+            $sql .= " WHERE ( csd1.current_state = %1 OR csd1.current_state = %2 ) ";                  
+            $sql .= " AND ctrc.id IS NULL LIMIT 20";
+            $params = array( 1 => array( 10, 'Int' ), 2 => array(1, 'Int') );
+            $dao = CRM_Core_DAO::executeQuery( $sql, $params);
+            while ($dao->fetch()) {
+              $regularAmount = substr($dao->regular_amount, 2);
+              $transactionRecordFound = false;
+              if (!empty($dao->contact_id)) {
+                $missingContactID = $dao->contact_id;
+                $missingContactName = $dao->display_name;
+                $listArray[$dao->smart_debit_id]['fix_me_url']								= 'civicrm/smartdebit/reconciliation/fix-corrupt-recurring-rec?reference_number='.$dao->reference_number;				
+              } else {
+                $missingContactID = 0;
+                $missingContactName = $dao->first_name.' '.$dao->last_name;
+                $listArray[$dao->smart_debit_id]['fix_me_url']								= '/civicrm/smartdebit/reconciliation/fixmissingcivi?reference_number='.$dao->reference_number;									
+              }
+              $differences = 'Transaction: ' .$dao->reference_number. ' not Found in Civi';
+              $listArray[$dao->smart_debit_id]['recordFound']								= $transactionRecordFound;
+              $listArray[$dao->smart_debit_id]['contact_id']								= $missingContactID;
+              $listArray[$dao->smart_debit_id]['contact_name']							= $missingContactName;
+              $listArray[$dao->smart_debit_id]['differences']								= $differences;
+              $listArray[$dao->smart_debit_id]['sd_contact_id']							= $dao->payerReference;
+              $listArray[$dao->smart_debit_id]['sd_start_date']							= $dao->start_date;
+              $listArray[$dao->smart_debit_id]['sd_frequency']							= $dao->frequency_type;
+              $listArray[$dao->smart_debit_id]['sd_amount']									= $regularAmount;
+              $listArray[$dao->smart_debit_id]['sd_contribution_status_id'] = $dao->current_state;
+              $listArray[$dao->smart_debit_id]['transaction_id']            = $dao->reference_number;
+              $listArray[$dao->smart_debit_id]['sd_frequency']              = $dao->frequency_type;
 
-									$params = array( 1 => array( $smartDebitRecord['payerReference'], 'String' ) );
-									$dao = CRM_Core_DAO::executeQuery( $sql, $params);
-
-									if ($dao->fetch()) {
-										$missingContactID = $dao->id;
-										$missingContactName = $dao->display_name;
-										
-										// We've found a contact id matching that in smart debit
-										// Need to determine if its a correupt renewal or something
-										// i.e. there is a pending payment for the recurring record and the recurring record itself 
-										$listArray[$key]['fix_me_url']								= 'civicrm/smartdebit/reconciliation/fix-corrupt-recurring-rec?reference_number='.$smartDebitRecord['reference_number'];									
-										
-									} else {
-										$missingContactID = 0;
-										$missingContactName = $smartDebitRecord['first_name'].' '.$smartDebitRecord['last_name'];
-									}
-									//Contact ID for this transaction found but no recurring contribution exists in Civi for this Contact ID
-									$transactionRecordFound = false;
-
-									$differences = 'Transaction: ' .$smartDebitRecord['reference_number']. ' not Found in Civi';
-
-									$listArray[$key]['recordFound']								= $transactionRecordFound;
-									$listArray[$key]['contact_id']								= $missingContactID;
-									$listArray[$key]['contact_name']							= $missingContactName;
-									$listArray[$key]['differences']								= $differences;
-									$listArray[$key]['sd_contact_id']							= $smartDebitRecord['payerReference'];
-									$listArray[$key]['sd_start_date']							= $smartDebitRecord['start_date'];
-									$listArray[$key]['sd_frequency']							= $smartDebitRecord['frequency_type'];
-									$listArray[$key]['sd_amount']									= $regularAmount;
-									$listArray[$key]['sd_contribution_status_id'] = $smartDebitRecord['current_state'];
-                  $listArray[$key]['transaction_id']            = $smartDebitRecord['reference_number'];
-                  $listArray[$key]['sd_frequency']              = $smartDebitRecord['frequency_type'];
-
-							  }
+              // We've found a contact id matching that in smart debit
+              // Need to determine if its a correupt renewal or something
+              // i.e. there is a pending payment for the recurring record and the recurring record itself 
             }
-        } 
+            $query = "SELECT FOUND_ROWS()";
+            $totalRows = CRM_Core_DAO::singleValueQuery( $query );
+          }
         
 			  if (CRM_Utils_Array::value('checkMissingFromSD', $_GET)) {
 
 					// 4. Transaction Id in Civi but none in Smart Debit
-					$arrayIndex = $key + 1;
+					$arrayIndex = 1;
 
-					$sql  = " SELECT ctrc.id contribution_recur_id ";
+					$sql  = " SELECT SQL_CALC_FOUND_ROWS ctrc.id contribution_recur_id ";
 					$sql .= " , ctrc.contact_id ";
 					$sql .= " , cont.display_name ";
 					$sql .= " , ctrc.payment_instrument_id ";
@@ -299,17 +323,19 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
 					$sql .= " , ctrc.trxn_id  ";
 					$sql .= " , ctrc.contribution_status_id ";
 					$sql .= " FROM ";
-					$sql .= " civicrm_contribution_recur ctrc ";
+					$sql .= " civicrm_contribution_recur ctrc";
 					$sql .= " LEFT JOIN civicrm_contact cont ON (ctrc.contact_id = cont.id) ";
 					$sql .= " LEFT JOIN civicrm_option_value opva ON (ctrc.payment_instrument_id = opva.value) ";
 					$sql .= " LEFT JOIN civicrm_option_group opgr ON (opgr.id = opva.option_group_id) ";
+          $sql .= " LEFT JOIN civicrm_sd_refresh csd ON csd.reference_number = ctrc.trxn_id ";
 					$sql .= " WHERE opgr.name = 'payment_instrument' ";
 					$sql .= " AND   opva.label = 'Direct Debit' ";
-					$sql .= " AND ctrc.trxn_id NOT IN ( $transactionIdList )";
-
+					$sql .= " AND   csd.id IS NULL LIMIT 20 ";
+         
 					$dao = CRM_Core_DAO::executeQuery( $sql );
 
 					while ($dao->fetch()) {
+              $transactionRecordFound = false;
 
 							$differences = 'Transaction: ' .$dao->trxn_id. ' not Found in Smart Debit';
 
@@ -321,8 +347,15 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
 							$arrayIndex = $arrayIndex + 1;
 
 					}
+          $query = "SELECT FOUND_ROWS()";
+          $totalRows = CRM_Core_DAO::singleValueQuery( $query );
 				}
-				CRM_Utils_System::setTitle( 'Found '.count($listArray).' Difference(s)' );
+        if (CRM_Utils_Array::value('checkMissingFromCivi', $_GET) || CRM_Utils_Array::value('checkMissingFromSD', $_GET)) {
+          $title = 'Showing '.count($listArray).' of '.$totalRows.' Difference(s)';
+        } else {
+          $title = 'Found '.count($listArray).' Difference(s)';
+        }
+				CRM_Utils_System::setTitle( $title );
 				
 				// Shrink the array if its > 100
 				$newListArray = array();
@@ -785,4 +818,84 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
       }
       return 0;
     }
+    
+    function insertSmartDebitToTable() {
+      // If no civicrm_sd, then create that table
+      if(!CRM_Core_DAO::checkTableExists('civicrm_sd_refresh')) {
+        $creatSql = "CREATE TABLE `civicrm_sd_refresh` (
+            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+            `title` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+            `first_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+            `last_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+            `email_address` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+            `address_1` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+            `address_2` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+            `address_3` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+            `town` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+            `county` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+            `postcode` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+            `first_amount` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+            `regular_amount` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+            `frequency_type` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+            `frequency_factor` int(10) unsigned DEFAULT NULL,
+            `start_date` datetime NOT NULL,
+            `current_state` int(10) unsigned DEFAULT NULL,					
+            `reference_number` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+            `payerReference` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+            PRIMARY KEY (`id`)
+           ) ENGINE=InnoDB AUTO_INCREMENT=350 DEFAULT CHARSET=latin1";
+
+        CRM_Core_DAO::executeQuery($creatSql);
+    }
+    // if the civicrm_sd table exists, then empty it
+    else {
+      $emptySql = "TRUNCATE TABLE `civicrm_sd_refresh`";
+      CRM_Core_DAO::executeQuery($emptySql);
+    }
+    $smartDebitArray = self::getSmartDebitPayments(NULL);
+    foreach ($smartDebitArray as $key => $smartDebitRecord) {
+      $sql = "INSERT INTO `civicrm_sd_refresh`(
+            `title`,
+            `first_name`,
+            `last_name`, 
+            `email_address`,
+            `address_1`, 
+            `address_2`, 
+            `address_3`, 
+            `town`, 
+            `county`,
+            `postcode`,
+            `first_amount`,
+            `regular_amount`,
+            `frequency_type`,
+            `frequency_factor`,
+            `start_date`,
+            `current_state`,
+            `reference_number`,
+            `payerReference`
+            ) 
+            VALUES (%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11,%12,%13,%14,%15,%16,%17, %18)";
+      $params = array(
+        1 => array( $smartDebitRecord['title'] ? $smartDebitRecord['title'] : 'NULL'  , 'String' ),
+        2 => array( $smartDebitRecord['first_name'] ? $smartDebitRecord['first_name'] : 'NULL' , 'String' ),
+        3 => array( $smartDebitRecord['last_name'] ? $smartDebitRecord['last_name'] : 'NULL' , 'String' ),
+        4 => array( $smartDebitRecord['email_address'] ?  $smartDebitRecord['email_address'] : 'NULL',  'String'),
+        5 => array( $smartDebitRecord['address_1'] ? $smartDebitRecord['address_1'] : 'NULL', 'String' ),
+        6 => array( $smartDebitRecord['address_2'] ? $smartDebitRecord['address_2'] : 'NULL', 'String' ),
+        7 => array( $smartDebitRecord['address_3']  ?$smartDebitRecord['address_3'] : 'NULL', 'String' ),
+        8 => array( $smartDebitRecord['town'] ? $smartDebitRecord['town'] : 'NULL', 'String' ),
+        9 => array( $smartDebitRecord['county'] ? $smartDebitRecord['county'] : 'NULL', 'String' ),
+        10 => array( $smartDebitRecord['postcode'] ? $smartDebitRecord['postcode'] : 'NULL', 'String' ),
+        11 => array( $smartDebitRecord['first_amount'] ? $smartDebitRecord['first_amount'] : 'NULL', 'String' ),
+        12 => array( $smartDebitRecord['regular_amount'] ? $smartDebitRecord['regular_amount'] : 'NULL', 'String' ),
+        13 => array( $smartDebitRecord['frequency_type'] ? $smartDebitRecord['frequency_type'] : 'NULL', 'String' ),
+        14 => array( $smartDebitRecord['frequency_factor'] ? $smartDebitRecord['frequency_factor'] : NULL, 'Int' ),
+        15 => array( $smartDebitRecord['start_date'] ? $smartDebitRecord['start_date'] : 'NULL', 'String' ),
+        16 => array( $smartDebitRecord['current_state'] ? $smartDebitRecord['current_state'] : NULL, 'Int' ),
+        17 => array( $smartDebitRecord['reference_number'] ? $smartDebitRecord['reference_number'] : 'NULL', 'String' ),
+        18 => array( $smartDebitRecord['payerReference'] ? $smartDebitRecord['payer_reference'] : 'NULL', 'String' ),
+      );
+      CRM_Core_DAO::executeQuery($sql, $params);
+    }
+  }
 }

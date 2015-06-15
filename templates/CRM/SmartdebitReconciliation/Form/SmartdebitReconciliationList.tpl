@@ -25,6 +25,7 @@
 *}
 {if $sync eq 0}
 <p>
+<a href="/civicrm/smartdebit/reconciliation/list?runSmartDebitRefresh=1">Run Smart Debit List</a><br />
 <a href="/civicrm/smartdebit/reconciliation/list?checkMissingFromCivi=1">Show All Mandates Missing from CiviCRM</a><br />
 <a href="/civicrm/smartdebit/reconciliation/list?checkMissingFromSD=1">Show All Mandates Missing from Smart Debit</a><br />
 <a href="/civicrm/smartdebit/reconciliation/list?checkAmount=1">Show All Mandates with Differing Amounts</a><br />
@@ -39,7 +40,6 @@
     <table  class="selector row-highlight">
         <tr style="background-color: #CDE8FE;">
            <td><b>{ts}Transaction ID{/ts}</td>
-           {if $row.contribution_recur_id }<td><b>{ts}Type{/ts}</b></td>{/if}
            <td><b>{ts}Contact{/ts}</td>
            <td><b>{ts}Differences{/ts}</td>
 {*           <td><b>{ts}Payment Instrument{/ts}</td>*}
@@ -58,10 +58,7 @@
                 {else}
                     {$row.transaction_id}
                 {/if}
-                </td>
-                {if $row.contribution_recur_id }
-                <td>{$row.contribution_type}</td>
-                {/if}
+                </td>                
                 <td>
                 {if $row.contact_id gt 0}
                     <a href="/civicrm/contact/view?cid={$row.contact_id}">{$row.contact_name}</a>
