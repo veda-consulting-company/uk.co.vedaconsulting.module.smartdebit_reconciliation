@@ -484,6 +484,9 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
           $resultsArray['StatusDetail'] = curl_error($session);
         }
         else {
+          // To avoid memory issue if output has large set of data
+          ini_set('memory_limit', '-1');
+          
           // Results are XML so turn this into a PHP Array
           $resultsArray = json_decode(json_encode((array) simplexml_load_string($output)),1);  
 
@@ -846,6 +849,8 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
            ) ENGINE=InnoDB AUTO_INCREMENT=350 DEFAULT CHARSET=latin1";
 
         CRM_Core_DAO::executeQuery($creatSql);
+        $alterQuery = "alter table civicrm_sd_refresh add index reference_number_idx(reference_number)";
+        CRM_Core_DAO::executeQuery($alterQuery);
     }
     // if the civicrm_sd table exists, then empty it
     else {
@@ -893,7 +898,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
         15 => array( $smartDebitRecord['start_date'] ? $smartDebitRecord['start_date'] : 'NULL', 'String' ),
         16 => array( $smartDebitRecord['current_state'] ? $smartDebitRecord['current_state'] : NULL, 'Int' ),
         17 => array( $smartDebitRecord['reference_number'] ? $smartDebitRecord['reference_number'] : 'NULL', 'String' ),
-        18 => array( $smartDebitRecord['payerReference'] ? $smartDebitRecord['payer_reference'] : 'NULL', 'String' ),
+        18 => array( $smartDebitRecord['payerReference'] ? $smartDebitRecord['payerReference'] : 'NULL', 'String' ),
       );
       CRM_Core_DAO::executeQuery($sql, $params);
     }
