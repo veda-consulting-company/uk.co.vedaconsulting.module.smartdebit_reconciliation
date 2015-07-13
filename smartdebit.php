@@ -107,3 +107,34 @@ function smartdebit_civicrm_navigationMenu( &$params ) {
                                             )
                         );
 }
+
+function smartdebit_civicrm_pageRun(&$page) {
+  $pageName = $page->getVar('_name');
+  if ($pageName == 'CRM_Contribute_Page_Tab') {
+    $query = "
+      SELECT cr.id, cr.trxn_id FROM civicrm_contribution_recur cr
+      INNER JOIN civicrm_payment_processor CPP ON cpp.id = cr.payment_processor_id
+      INNER JOIN civicrm_payment_processor_type cppt ON cppt.id = cpp.payment_processor_type_id
+      LEFT JOIN civicrm_option_value opva ON (cr.payment_instrument_id = opva.value)
+      LEFT JOIN civicrm_option_group opgr ON (opgr.id = opva.option_group_id) 
+      WHERE cppt.name = %1 AND cr.contact_id = %2 AND opgr.name = %3 AND opva.label = %4";
+    
+    $queryParams = array (
+      1 => array('Smart Debit', 'String'),
+      2 => array($page->getVar('_contactId'), 'Int'),
+      3 => array('payment_instrument', 'String'),
+      4 => array('Direct Debit', 'String'),
+    );
+    
+    $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
+    $contributionRecurDetails = array();
+    while ($dao->fetch()) {
+      $smartDebitResponse = CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList::getSmartDebitPayments($dao->trxn_id);
+      foreach ($smartDebitResponse[0] as $key => $value) {
+        $contributionRecurDetails[$dao->id][$key] = $value;
+      }
+    }
+    $contributionRecurDetails = json_encode($contributionRecurDetails);
+    $page->assign('contributionRecurDetails', $contributionRecurDetails);
+  }
+}
