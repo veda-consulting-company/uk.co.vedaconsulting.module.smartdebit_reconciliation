@@ -113,7 +113,7 @@ function smartdebit_civicrm_pageRun(&$page) {
   if ($pageName == 'CRM_Contribute_Page_Tab') {
     $query = "
       SELECT cr.id, cr.trxn_id FROM civicrm_contribution_recur cr
-      INNER JOIN civicrm_payment_processor CPP ON cpp.id = cr.payment_processor_id
+      INNER JOIN civicrm_payment_processor cpp ON cpp.id = cr.payment_processor_id
       INNER JOIN civicrm_payment_processor_type cppt ON cppt.id = cpp.payment_processor_type_id
       LEFT JOIN civicrm_option_value opva ON (cr.payment_instrument_id = opva.value)
       LEFT JOIN civicrm_option_group opgr ON (opgr.id = opva.option_group_id) 
