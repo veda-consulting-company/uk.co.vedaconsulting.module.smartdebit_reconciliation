@@ -281,7 +281,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
               if (!empty($dao->contact_id)) {
                 $missingContactID = $dao->contact_id;
                 $missingContactName = $dao->display_name;
-                $listArray[$dao->smart_debit_id]['fix_me_url']								= 'civicrm/smartdebit/reconciliation/fix-corrupt-recurring-rec?reference_number='.$dao->reference_number;				
+                $listArray[$dao->smart_debit_id]['fix_me_url']								= '/civicrm/smartdebit/reconciliation/fixmissingcivi?cid='.$dao->contact_id.'&reference_number='.$dao->reference_number;				
               } else {
                 $missingContactID = 0;
                 $missingContactName = $dao->first_name.' '.$dao->last_name;

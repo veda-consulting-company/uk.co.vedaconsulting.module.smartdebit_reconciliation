@@ -111,6 +111,6 @@
 </div>
 <div>
     <span class="crm-button crm-button-type-upload crm-button_qf_ContactDetails_upload">
-  <input type="submit" name="submit" value="Submit" onclick="parent.location='/civicrm/smartdebit/reconciliation/fix-contact-rec?cid={$aContact.id}&mid={$aMembership.id}&cr_id={$aContributionRecur.id}&reference_number={$reference_number}'"/>
+  <input class="form-submit" type="submit" name="submit" value="Submit" onclick="parent.location='/civicrm/smartdebit/reconciliation/fix-contact-rec?cid={$aContact.id}&mid={$aMembership.id}&cr_id={$aContributionRecur.id}&reference_number={$reference_number}'"/>
     </span>
 </div>
