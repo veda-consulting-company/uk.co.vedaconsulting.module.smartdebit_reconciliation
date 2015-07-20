@@ -54,7 +54,7 @@
             <tr class="{cycle values="odd-row,even-row"}">
                 <td>
 		{if $row.contribution_recur_id }
-                    <a href="/civicrm/contact/view/contributionrecur?id={$row.contribution_recur_id}">{$row.transaction_id}</a>
+                    <a href="/civicrm/contact/view/contributionrecur?reset=1&id={$row.contribution_recur_id}&cid={$row.contact_id}">{$row.transaction_id}</a>
                 {else}
                     {$row.transaction_id}
                 {/if}
@@ -80,7 +80,7 @@
                 {/if}
 								<td>
                 {if $row.recordFound}
-                    <a href="/civicrm/contact/view/contributionrecur?id={$row.contribution_recur_id}&action=update">Edit</a>
+                    <a href="/civicrm/contribute/updaterecur?reset=1&action=update&crid={$row.contribution_recur_id}&cid={$row.contact_id}">Edit</a>
                 {/if}
 								{if $row.fix_me_url}
                     <a href="{$row.fix_me_url}" target="_new">Fix Me</a>

@@ -49,8 +49,23 @@ class CRM_SmartdebitReconciliation_Form_MembershipRecurDetails extends CRM_Core_
 
      $this->assign( 'SDMandateArray', $smartDebitMandate );
 		 $this->assign( 'memStatusCurrent', self::c_current_membership_status ); //MV, to set the current membership as default, when ajax loading
-
+     $cid = CRM_Utils_Array::value('cid', $_GET);
+     $this->assign('cid', $cid);
+     $this->addFormRule(array('CRM_SmartdebitReconciliation_Form_MembershipRecurDetails', 'formRule'), $this);
+   
 		parent::buildQuickForm();
+  }
+  
+  static function formRule($params, $files, $self) {
+    $errors     = array();
+    // Check end date greater than start date
+    if (empty($params['cid'])) {
+      $errors['contact_name'] = 'Contact Not Matched In CiviCRM';
+    }
+    if (!empty($errors)) {
+      return $errors;
+    }
+    return TRUE;
   }
 	
   /**
@@ -63,7 +78,7 @@ class CRM_SmartdebitReconciliation_Form_MembershipRecurDetails extends CRM_Core_
   function setDefaultValues() {
     $defaults = array();
     $defaults['reference_number'] = CRM_Utils_Array::value('reference_number', $_GET);
-
+    $defaults['cid']              = CRM_Utils_Array::value('cid', $_GET);
     return $defaults;
   }
 	

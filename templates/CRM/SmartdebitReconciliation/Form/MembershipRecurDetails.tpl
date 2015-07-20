@@ -93,7 +93,7 @@
     {literal}
       var memStatusCurrent = {/literal}"{$memStatusCurrent}"{literal}; //MV assigned the memership Status Name 'Current' as constant
       var contactUrl = {/literal}"{crmURL p='civicrm/ajax/rest' q='className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=navigation' h=0 }"{literal};
-      var getTemplateContentUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_SmartdebitReconciliation_Page_AJAX&fnName=getMembershipByContactID&json=1'}"{literal}  
+      var getTemplateContentUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_SmartdebitReconciliation_Page_AJAX&fnName=getMembershipByContactID&json=1'}"{literal} 
       cj( '#contact_name' ).autocomplete( contactUrl, {
           width: 200,
           selectFirst: false,
@@ -108,49 +108,64 @@
           cj('#membership_record').parents('tr').show();
           cj('#contribution_recur_record').parents('tr').show();
           cj('.crm-submit-buttons').show();
-          cj.ajax({
-              url : getTemplateContentUrl,
-              type: "POST",
-              data: {selectedContact: cid},
-              async: false,
-              datatype:"json",
-              success: function(data, status){
-                cj('#membership_record').find('option').remove();
-                cj('#contribution_recur_record').find('option').remove();
-                var options = cj.parseJSON(data);
-                cj.each(options, function(key, value) {
-                  if(key == "membership"){
-                  var opMem = value;
-                  cj.each(opMem, function(memID, text) {
-                    cj('#membership_record').append(cj('<option>', { 
-                      value: memID,
-                      text : text 
-                     }));
-                    //MV to set the current membership as default
-                    var temp = text.split('/');
-                    if( temp[1] == memStatusCurrent ){
-                      cj('#membership_record option[value='+memID+']').attr('selected', true);
-                    }
-                    //end
-                  });
-                  }
-                 if(key == "cRecur"){
-                  var opRecur = value;
-                  cj.each(opRecur, function(crID, Recurtext) {
-                    cj('#contribution_recur_record').append(cj('<option>', { 
-                      value: crID,
-                      text : Recurtext 
-                     }));
-                  });
-                  }
-                });
+          getMembershipAndRecur(cid);
+      }); 
+      
+    function getMembershipAndRecur(cid) {
+        var getTemplateContentUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_SmartdebitReconciliation_Page_AJAX&fnName=getMembershipByContactID&json=1'}"{literal} 
+        cj.ajax({
+          url : getTemplateContentUrl,
+          type: "POST",
+          data: {selectedContact: cid},
+          async: false,
+          datatype:"json",
+          success: function(data, status){
+            cj('#membership_record').find('option').remove();
+            cj('#contribution_recur_record').find('option').remove();
+            var options = cj.parseJSON(data);
+            cj.each(options, function(key, value) {
+              if(key == "membership"){
+              var opMem = value;
+              cj.each(opMem, function(memID, text) {
+                cj('#membership_record').append(cj('<option>', { 
+                  value: memID,
+                  text : text 
+                 }));
+                //MV to set the current membership as default
+                var temp = text.split('/');
+                if( temp[1] == memStatusCurrent ){
+                  cj('#membership_record option[value='+memID+']').attr('selected', true);
+                }
+                //end
+              });
               }
-           });
-      });    
-      cj(document).ready(function(){
-        cj('#membership_record').parents('tr').hide();
-        cj('#contribution_recur_record').parents('tr').hide();
-        cj('.crm-submit-buttons').hide();
-      });
+             if(key == "cRecur"){
+              var opRecur = value;
+              cj.each(opRecur, function(crID, Recurtext) {
+                cj('#contribution_recur_record').append(cj('<option>', { 
+                  value: crID,
+                  text : Recurtext 
+                 }));
+              });
+              }
+            });
+          }
+       });
+          
+    }
+    cj(document).ready(function(){
+      var cid = {/literal}"{$cid}"{literal};
+      if (cid) {
+          cj('#contact_name').parents('tr').hide();
+          cj('#membership_record').parents('tr').show();
+          cj('#contribution_recur_record').parents('tr').show();
+          cj('.crm-submit-buttons').show();
+          getMembershipAndRecur(cid);
+      } else {
+          cj('#membership_record').parents('tr').hide();
+          cj('#contribution_recur_record').parents('tr').hide();
+          cj('.crm-submit-buttons').hide();
+      }
+    });
      {/literal}
   </script>
