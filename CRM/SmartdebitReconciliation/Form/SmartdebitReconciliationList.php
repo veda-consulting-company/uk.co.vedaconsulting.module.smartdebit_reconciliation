@@ -246,6 +246,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
                   $listArray[$dao->smart_debit_id]['sd_contribution_status_id'] = $dao->current_state;
                   $listArray[$dao->smart_debit_id]['transaction_id']        = $dao->trxn_id;
                   $listArray[$dao->smart_debit_id]['differences']           = $differences;
+                  $listArray[$dao->smart_debit_id]['fix_me_url']						= '/civicrm/smartdebit/reconciliation/fixmissingcivi?cid='.$dao->contact_id.'&reference_number='.$dao->reference_number;				
 //print_r($smartDebitRecord);
 //print_r($dao);
 //die;
@@ -635,7 +636,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
         $params['trxn_id'] = $params['payer_reference'];
         list($y, $m, $d) = explode('-', $smartDebitRecord['start_date']);
         $params['cycle_day'] = $d;
-
+        
 				// First Check if a recurring record has beeen selected
         if ((!isset($params['contribution_recur_id']) || empty($params['contribution_recur_id']))) {
           // Create the Recurring
@@ -702,7 +703,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
       //print_r($params);
 
       $recurResult = civicrm_api("ContributionRecur","create", $recurParams);
-      
+          
       // Populate the membership id on repair recur
       $params['contribution_recur_id'] = $recurResult['id'];
       

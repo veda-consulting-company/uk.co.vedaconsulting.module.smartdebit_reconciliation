@@ -78,14 +78,11 @@
                     <td>{$row.sd_amount}</td>
                     <td>{$row.sd_contribution_status_id}</td>  
                 {/if}
-								<td>
-                {if $row.recordFound}
-                    <a href="/civicrm/contribute/updaterecur?reset=1&action=update&crid={$row.contribution_recur_id}&cid={$row.contact_id}">Edit</a>
-                {/if}
-								{if $row.fix_me_url}
+                <td>
+                {if $row.fix_me_url}
                     <a href="{$row.fix_me_url}" target="_new">Fix Me</a>
                 {/if}
-								</td>
+                </td>
             </tr>
         {/foreach}  
 
