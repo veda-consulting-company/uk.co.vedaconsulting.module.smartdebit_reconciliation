@@ -166,6 +166,37 @@
           cj('#contribution_recur_record').parents('tr').hide();
           cj('.crm-submit-buttons').hide();
       }
+      // When membership option is changed to 'Donation', show only recurring contributions which are not linked to memberships.
+      cj( "#membership_record" ).change(function() {
+        var val = cj('#membership_record option:selected').text();
+        var getTemplateContentUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_SmartdebitReconciliation_Page_AJAX&fnName=getNotLinkedRecurringByContactID&json=1'}"{literal} 
+        cj.ajax({
+          url : getTemplateContentUrl,
+          type: "POST",
+          data: {selectedContact: cid},
+          async: false,
+          datatype:"json",
+          success: function(data, status){
+            var options = cj.parseJSON(data);
+            if (val == 'Donation') {
+                var opRecur = options.cRecurNotLinked;
+                populateRecur(opRecur);
+            } else {
+                var opRecur = options.cRecur;
+                populateRecur(opRecur);
+            }
+          }
+        });
+      });
+      function populateRecur(opRecur) {
+        cj('#contribution_recur_record').find('option').remove();
+        cj.each(opRecur, function(crID, Recurtext) {
+          cj('#contribution_recur_record').append(cj('<option>', { 
+            value: crID,
+            text : Recurtext 
+           }));
+        });
+      }
     });
      {/literal}
   </script>

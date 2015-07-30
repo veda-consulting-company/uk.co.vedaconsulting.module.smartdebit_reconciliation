@@ -20,5 +20,30 @@ class CRM_SmartdebitReconciliation_Page_AJAX
         exit;
     } 
     
+    static function getNotLinkedRecurringByContactID() {
+      $selectedContact = CRM_Utils_Array::value( 'selectedContact', $_POST );
+      $mParams = array(
+                'version'     => 3,
+                'sequential'  => 1,
+                'contact_id' => $selectedContact
+              );
+      $aMembership = civicrm_api('Membership', 'get', $mParams);
+      $membershipWithRecur = array();
+      foreach ($aMembership['values'] as $membership ) {
+        if (!empty($membership['contribution_recur_id'])) {
+          $membershipWithRecur [] = $membership['contribution_recur_id'];
+        }
+      }
+      $allRecurringRecords = $originalAllRecurringRecords = CRM_SmartdebitReconciliation_Utils::get_Recurring_Record( $selectedContact );
+      foreach ($membershipWithRecur as $linkedRecur) {
+        if(array_key_exists($linkedRecur, $allRecurringRecords)) {
+          unset($allRecurringRecords[$linkedRecur]);
+        }
+      }
+      $options['cRecurNotLinked']     = $allRecurringRecords;
+      $options['cRecur']              = $originalAllRecurringRecords;
+      echo json_encode($options);
+        exit;
+    }
    
 }

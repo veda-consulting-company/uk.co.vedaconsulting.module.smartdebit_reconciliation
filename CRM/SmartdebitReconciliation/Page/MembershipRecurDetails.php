@@ -134,11 +134,13 @@ Class CRM_SmartdebitReconciliation_Page_MembershipRecurDetails extends CRM_Core_
         $this->assign('aContact', $contact);
         $this->assign('aAddress', $address);
       }
-      if(!empty($mid)){
+      // If 'Donation' option is choosen for membership, don't process
+      if(!empty($mid) && $mid != 'donation'){
        $membership = self::_get_membership($mid);
        $this->assign('aMembership', $membership);
       }
-      if(!empty($cr_id)){
+      // If 'Create New Recurring' option is choosen for recurring, don't process
+      if(!empty($cr_id) && $cr_id != 'new_recur'){
         $cRecur     = self::_get_contribution_recur($cr_id);
         $this->assign('aContributionRecur', $cRecur);
       }
