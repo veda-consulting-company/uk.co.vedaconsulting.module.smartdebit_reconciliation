@@ -78,6 +78,7 @@ class CRM_SmartdebitReconciliation_Utils{
                              ); */
       $aMembershipOption[$mem_id] = $type.'/'.$status.'/'.$start_date.'/'.$end_date;
      }
+     $aMembershipOption['donation'] = 'Donation';
    return $aMembershipOption;
   }
   
@@ -110,6 +111,7 @@ class CRM_SmartdebitReconciliation_Utils{
       
       $cRecur[$ContributionRecur['id']] = $dao.'/'.$ContributionRecur['contribution_status'].'/'.$ContributionRecur['amount'];
     }
+    $cRecur['new_recur'] = 'Create New Recurring';
     return $cRecur;
   }
 }
