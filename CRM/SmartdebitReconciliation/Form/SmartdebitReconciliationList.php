@@ -211,6 +211,12 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
 											$differences .= $separator. 'Status';
 											$separator = $separatorCharacter;
 									}
+									// Recurring record active in Civi, but smart debit record is not active
+									if (!($dao->current_state == 10 || $dao->current_state == 1) && ($dao->contribution_status_id == 5)) {
+											$different = true;
+											$differences .= $separator. 'Status';
+											$separator = $separatorCharacter;
+									}
 								}
 								
                 // 2. Transaction Id in Smart Debit and Civi for different contacts
@@ -635,6 +641,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
         $params['payment_processor_id'] = self::getSmartDebitPaymentProcessorID();
         $params['payment_instrument_id'] = UK_Direct_Debit_Form_Main::getDDPaymentInstrumentID();
         $params['trxn_id'] = $params['payer_reference'];
+        $params['current_state'] = $smartDebitRecord['current_state'];
         list($y, $m, $d) = explode('-', $smartDebitRecord['start_date']);
         $params['cycle_day'] = $d;
         
@@ -678,7 +685,11 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
             throw new InvalidArgumentException("Missing params[$required]");
         }
       }
-
+      
+      $contribution_status_id = 5; // In Progress
+      if (!($params['current_state'] == 10 || $params['current_state'] == 1)) {
+	$contribution_status_id = 3;  
+      }
       // Create contribution recur record
       $recurParams = array(
         'version' => 3,
@@ -687,7 +698,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
         'contact_id' => $params['contact_id'],
         'frequency_interval' => $params['recur_frequency_interval'],
         'amount' => $params['amount'], /* TODO Need to find the amount to charge */
-        'contribution_status_id' => 5,
+        'contribution_status_id' => $contribution_status_id,
         'start_date' => $params['recur_start_date'],
         'next_sched_contribution' => $params['recur_next_payment_date'],
         'auto_renew' => '1',
@@ -742,14 +753,17 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
             throw new InvalidArgumentException("Missing params[$required]");
         }
       }
-      
+      $contribution_status_id = 5; // In Progress
+      if (!($params['current_state'] == 10 || $params['current_state'] == 1)) {
+	$contribution_status_id = 3;  
+      }
       // Create contribution recur record
       $recurParams = array(
         'version' => 3,
         'contact_id' => $params['contact_id'],
         'frequency_interval' => $params['recur_frequency_interval'],
         'amount' => $params['amount'], /* TODO Need to find the amount to charge */
-        'contribution_status_id' => 5,
+        'contribution_status_id' => $contribution_status_id,
         'start_date' => $params['recur_start_date'],
         'next_sched_contribution' => $params['recur_next_payment_date'],
         'auto_renew' => '1',
