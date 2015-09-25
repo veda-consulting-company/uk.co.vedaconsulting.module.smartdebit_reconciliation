@@ -18,7 +18,11 @@ class CRM_SmartdebitReconciliation_Form_MembershipRecurDetails extends CRM_Core_
                       , array( '' => ts('Loading...')) 
                       );
     
-     $this->addElement('text', 'contact_name', 'Contact', array('size' => 50, 'maxlength' => 255));
+     //$this->addElement('text', 'contact_name', 'Contact', array('size' => 50, 'maxlength' => 255));
+     $this->addEntityRef('contact_name', ts('Contact'), array(
+          'create' => FALSE,
+          'api' => array('extra' => array('email')),
+        ));
      $this->addElement('hidden', 'cid', 'cid');
   
      $this->addElement('text', 'reference_number', 'Smart Debit Reference', array('size' => 50, 'maxlength' => 255));

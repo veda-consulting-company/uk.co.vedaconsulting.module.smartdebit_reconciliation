@@ -1,7 +1,7 @@
 <?php
 
 class CRM_SmartdebitReconciliation_Utils{
-   function _get_membership_type( $membershipTypeID ){
+  static function _get_membership_type( $membershipTypeID ){
     if( empty($membershipTypeID)){
       return "Not Found";
     }
@@ -23,7 +23,7 @@ class CRM_SmartdebitReconciliation_Utils{
       return $dao;
     }
   }
-  function _get_membership_status( $membershipStatusID ){
+  static function _get_membership_status( $membershipStatusID ){
     if( empty($membershipStatusID)){
       return "Not Found";
     }
