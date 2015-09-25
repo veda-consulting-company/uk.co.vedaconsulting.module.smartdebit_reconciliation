@@ -84,16 +84,30 @@
      {include file="CRM/common/formButtons.tpl" location="bottom"}
   </div>
 </div>
+  {literal}
   <style>
     .crm-container select {
       width:500px;
     }
   </style>
+  {/literal}
   <script type="text/javascript">
     {literal}
       var memStatusCurrent = {/literal}"{$memStatusCurrent}"{literal}; //MV assigned the memership Status Name 'Current' as constant
       var contactUrl = {/literal}"{crmURL p='civicrm/ajax/rest' q='className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=navigation' h=0 }"{literal};
       var getTemplateContentUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_SmartdebitReconciliation_Page_AJAX&fnName=getMembershipByContactID&json=1'}"{literal} 
+      var $form = cj("form.{/literal}{$form.formClass}{literal}");
+      cj("#contact_name", $form).change(function() {
+	var data = cj( '#contact_name' ).select2('data');
+	var cid  = data.id;
+	cj('input[name=cid]').val(cid);
+	 cj('#membership_record').parents('tr').show();
+          cj('#contribution_recur_record').parents('tr').show();
+          cj('.crm-submit-buttons').show();
+          getMembershipAndRecur(cid);
+	
+      });
+      /*
       cj( '#contact_name' ).autocomplete( contactUrl, {
           width: 200,
           selectFirst: false,
@@ -110,6 +124,7 @@
           cj('.crm-submit-buttons').show();
           getMembershipAndRecur(cid);
       }); 
+      */
       
     function getMembershipAndRecur(cid) {
         var getTemplateContentUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_SmartdebitReconciliation_Page_AJAX&fnName=getMembershipByContactID&json=1'}"{literal} 

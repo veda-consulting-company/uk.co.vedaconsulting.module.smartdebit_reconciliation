@@ -1,7 +1,7 @@
 <?php
 Class CRM_SmartdebitReconciliation_Page_MembershipRecurDetails extends CRM_Core_Page{
   CONST c_ContributionStatus = "contribution_status";
-  function _get_contact_details( $cid ){
+  static function _get_contact_details( $cid ){
     $Params = array(
                 'version'     => 3,
                 'sequential'  => 1,
@@ -14,7 +14,7 @@ Class CRM_SmartdebitReconciliation_Page_MembershipRecurDetails extends CRM_Core_
       return $aContact['error_message'];
     }
   }
-  function _get_address( $cid ){
+  static function _get_address( $cid ){
     $Params = array(
                 'version'     => 3,
                 'sequential'  => 1,
@@ -32,7 +32,7 @@ Class CRM_SmartdebitReconciliation_Page_MembershipRecurDetails extends CRM_Core_
     }
     
   }
-  function _get_membership( $id ){
+  static function _get_membership( $id ){
     $mParams = array(
                 'version'     => 3,
                 'sequential'  => 1,
@@ -55,7 +55,7 @@ Class CRM_SmartdebitReconciliation_Page_MembershipRecurDetails extends CRM_Core_
     }
     return $membership;
   }
-  function _get_optionValue($opGroupID, $value){
+  static function _get_optionValue($opGroupID, $value){
     
      $optionValue = array(
                 'version'         => 3,
@@ -70,7 +70,7 @@ Class CRM_SmartdebitReconciliation_Page_MembershipRecurDetails extends CRM_Core_
       return $aOptionValue['error_message'];
     }
   }
-  function _get_optionGroup( $groupName ){
+  static function _get_optionGroup( $groupName ){
     
      $optionGroup = array(
                 'version'     => 3,
@@ -84,7 +84,7 @@ Class CRM_SmartdebitReconciliation_Page_MembershipRecurDetails extends CRM_Core_
       return $aOptionGroup['error_message'];
     }
   }
-  function _get_contribution_recur( $cRecurID ){
+  static function _get_contribution_recur( $cRecurID ){
     $cRecurParams = array(
                 'version'     => 3,
                 'sequential'  => 1,

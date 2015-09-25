@@ -392,7 +392,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
 		
   }//end of function
 
-  function getSmartDebitPayments($referenceNumber) {
+  static function getSmartDebitPayments($referenceNumber) {
     $paymentProcessorType = CRM_Core_PseudoConstant::paymentProcessorType(false, null, 'name');
     $paymentProcessorTypeId = CRM_Utils_Array::key('Smart Debit', $paymentProcessorType);
   
@@ -454,7 +454,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
         $url = URL to send request to
         $data = POST data to send (in URL encoded Key=value pairs)
     *************************************************************/
-    function requestPost($url, $username, $password){
+    static function requestPost($url, $username, $password){
         // Set a one-minute timeout for this script
         set_time_limit(160);
 
@@ -513,18 +513,18 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
 
     } // END function requestPost()
 
-    function getCleanSmartDebitAmount($smartDebitAmount) {
+   static function getCleanSmartDebitAmount($smartDebitAmount) {
       return(substr($smartDebitAmount, 2));
     }
     
-    function translateSmartDebitFrequency($smartDebitFrequency) {
+    static function translateSmartDebitFrequency($smartDebitFrequency) {
      if ($smartDebitFrequency == 'Q') {
         return 3;
       }
       return 1;
     }
 
-    function translateSmartDebitFrequencyUnit($smartDebitFrequency) {
+    static function translateSmartDebitFrequencyUnit($smartDebitFrequency) {
       if ($smartDebitFrequency == 'Q') {
         return('month' );
       }
@@ -616,7 +616,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
      * 
      * In All cases the recurring details are taken from Smart Debit so its crucial this is correct first
      */
-    function repair_missing_from_civicrm_record($params) {
+    static function repair_missing_from_civicrm_record($params) {
       foreach (array(
         'contact_id',
         'payer_reference') as $required) {
@@ -667,7 +667,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
     /* This is used when the fix process is used on the reconciliation
      * It should ensure the recur details match those of the smart debit record
      */
-    function repair_recur(&$params) {
+    static function repair_recur(&$params) {
       foreach (array(
         'contribution_recur_id',
         'contact_id',
@@ -824,7 +824,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
       $daoMembershipType = CRM_Core_DAO::executeQuery( $selectDDSql, $selectDDParams );
     }
     
-    function getSmartDebitPaymentProcessorID() {
+    static function getSmartDebitPaymentProcessorID() {
       // Get all contacts who have the tag set
       $selectSql     =  " SELECT id";
       $selectSql     .= " FROM civicrm_payment_processor cpp ";
@@ -874,6 +874,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
       CRM_Core_DAO::executeQuery($emptySql);
     }
     $smartDebitArray = self::getSmartDebitPayments(NULL);
+    CRM_Core_Error::debug_var('smart debit array count', count($smartDebitArray));
     foreach ($smartDebitArray as $key => $smartDebitRecord) {
       $sql = "INSERT INTO `civicrm_sd_refresh`(
             `title`,
@@ -912,10 +913,11 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
         13 => array( $smartDebitRecord['frequency_type'] ? $smartDebitRecord['frequency_type'] : 'NULL', 'String' ),
         14 => array( $smartDebitRecord['frequency_factor'] ? $smartDebitRecord['frequency_factor'] : NULL, 'Int' ),
         15 => array( $smartDebitRecord['start_date'] ? $smartDebitRecord['start_date'] : 'NULL', 'String' ),
-        16 => array( $smartDebitRecord['current_state'] ? $smartDebitRecord['current_state'] : NULL, 'Int' ),
+        16 => array( $smartDebitRecord['current_state'] ? $smartDebitRecord['current_state'] : 0, 'Int' ),
         17 => array( $smartDebitRecord['reference_number'] ? $smartDebitRecord['reference_number'] : 'NULL', 'String' ),
         18 => array( $smartDebitRecord['payerReference'] ? $smartDebitRecord['payerReference'] : 'NULL', 'String' ),
       );
+     // CRM_Core_Error::debug_var('$params', $params);
       CRM_Core_DAO::executeQuery($sql, $params);
     }
   }
