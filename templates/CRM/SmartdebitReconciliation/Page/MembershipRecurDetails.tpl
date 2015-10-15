@@ -1,6 +1,6 @@
 <h3>{ts}View Contact Details, Membership and Contribution Recur{/ts}</h3>
 <div class="crm-form-block">
-  <table>
+  <table class="crm-info-panel">
     <tr>
       <td width="30%">
         Smart Debit Reference :
