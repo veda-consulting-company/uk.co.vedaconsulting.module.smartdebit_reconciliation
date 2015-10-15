@@ -727,8 +727,8 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
                 SET membership_id = %1
                 WHERE id = %2 ";
 
-            $params = array( 1 => array( $params['membership_id'], 'Int' ), 2 => array($params['contribution_recur_id'], 'Int') );
-            $dao = CRM_Core_DAO::executeQuery($query, $params);
+            $query_params = array( 1 => array( $params['membership_id'], 'Int' ), 2 => array($params['contribution_recur_id'], 'Int') );
+            $dao = CRM_Core_DAO::executeQuery($query, $query_params);
           }
       }
     }
@@ -791,8 +791,8 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
                 SET membership_id = %1
                 WHERE id = %2 ";
 
-            $params = array( 1 => array( $params['membership_id'], 'Int' ), 2 => array($params['contribution_recur_id'], 'Int') );
-            $dao = CRM_Core_DAO::executeQuery($query, $params);
+            $query_params = array( 1 => array( $params['membership_id'], 'Int' ), 2 => array($params['contribution_recur_id'], 'Int') );
+            $dao = CRM_Core_DAO::executeQuery($query, $query_params);
           }
       }
       //print_r($recurResult);
