@@ -29,13 +29,13 @@
     <td>
       <div style="height:150px; overflow:auto;">
 	<p>
-	<a href="/civicrm/smartdebit/reconciliation/list?runSmartDebitRefresh=1">Run Smart Debit List</a><br />
-	<a href="/civicrm/smartdebit/reconciliation/list?checkMissingFromCivi=1">Show All Mandates Missing from CiviCRM</a><br />
-	<a href="/civicrm/smartdebit/reconciliation/list?checkMissingFromSD=1">Show All Mandates Missing from Smart Debit</a><br />
-	<a href="/civicrm/smartdebit/reconciliation/list?checkAmount=1">Show All Mandates with Differing Amounts</a><br />
-	<a href="/civicrm/smartdebit/reconciliation/list?checkFrequency=1">Show All Mandates with Differing Frequencies</a><br />
-	<a href="/civicrm/smartdebit/reconciliation/list?checkStatus=1">Show All Mandates with Differing Status</a><br />
-	<a href="/civicrm/smartdebit/reconciliation/list?checkPayerReference=1">Show All Mandates with missing Contact ID from CiviCRM</a><br />
+	  <a href="{crmURL p='civicrm/smartdebit/reconciliation/list' q='runSmartDebitRefresh=1' h=0}">Run Smart Debit List</a><br />
+	  <a href="{crmURL p='civicrm/smartdebit/reconciliation/list' q='checkMissingFromCivi=1' h=0}">Show All Mandates Missing from CiviCRM</a><br />
+	  <a href="{crmURL p='civicrm/smartdebit/reconciliation/list' q='checkMissingFromSD=1' h=0}">Show All Mandates Missing from Smart Debit</a><br />
+	  <a href="{crmURL p='civicrm/smartdebit/reconciliation/list' q='checkAmount=1' h=0}">Show All Mandates with Differing Amounts</a><br />
+	  <a href="{crmURL p='civicrm/smartdebit/reconciliation/list' q='checkFrequency=1' h=0}">Show All Mandates with Differing Frequencies</a><br />
+	  <a href="{crmURL p='civicrm/smartdebit/reconciliation/list' q='checkStatus=1' h=0}">Show All Mandates with Differing Status</a><br />
+	  <a href="{crmURL p='civicrm/smartdebit/reconciliation/list' q='checkPayerReference=1' h=0}">Show All Mandates with missing Contact ID from CiviCRM</a><br />
 	</p>      
       </div>
     </td>
