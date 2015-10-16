@@ -268,7 +268,8 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
                   $listArray[$dao->smart_debit_id]['sd_contribution_status_id'] = $dao->current_state;
                   $listArray[$dao->smart_debit_id]['transaction_id']        = $dao->trxn_id;
                   $listArray[$dao->smart_debit_id]['differences']           = $differences;
-                  $listArray[$dao->smart_debit_id]['fix_me_url']						= '/civicrm/smartdebit/reconciliation/fixmissingcivi?cid='.$dao->contact_id.'&reference_number='.$dao->reference_number;				
+		  $fixmeurl = CRM_Utils_System::url('civicrm/smartdebit/reconciliation/fixmissingcivi', "cid=".$dao->contact_id."&reference_number=".$dao->reference_number,  TRUE, NULL, FALSE, TRUE, TRUE);
+                  $listArray[$dao->smart_debit_id]['fix_me_url']						= $fixmeurl;			
 //print_r($smartDebitRecord);
 //print_r($dao);
 //die;
@@ -295,7 +296,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
             $sql .= " LEFT JOIN civicrm_contribution_recur ctrc ON ctrc.trxn_id = csd1.reference_number";
             $sql .= " LEFT JOIN civicrm_contact cont ON cont.id = csd1.payerReference";                  
             $sql .= " WHERE ( csd1.current_state = %1 OR csd1.current_state = %2 ) ";                  
-            $sql .= " AND ctrc.id IS NULL LIMIT 20";
+            $sql .= " AND ctrc.id IS NULL LIMIT 100";
             $params = array( 1 => array( 10, 'Int' ), 2 => array(1, 'Int') );
             $dao = CRM_Core_DAO::executeQuery( $sql, $params);
             while ($dao->fetch()) {
@@ -306,11 +307,13 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
                 $differences.= ' But Contact Found Using Smart Debit payerReference '. $dao->payerReference;
                 $missingContactID = $dao->contact_id;
                 $missingContactName = $dao->display_name;
-                $listArray[$dao->smart_debit_id]['fix_me_url']								= '/civicrm/smartdebit/reconciliation/fixmissingcivi?cid='.$dao->contact_id.'&reference_number='.$dao->reference_number;				
+		$fixmemissing = CRM_Utils_System::url('civicrm/smartdebit/reconciliation/fixmissingcivi', "cid=".$dao->contact_id."&reference_number=".$dao->reference_number,  TRUE, NULL, FALSE, TRUE, TRUE);
+                $listArray[$dao->smart_debit_id]['fix_me_url']								= $fixmemissing;				
               } else {
                 $missingContactID = 0;
                 $missingContactName = $dao->first_name.' '.$dao->last_name;
-                $listArray[$dao->smart_debit_id]['fix_me_url']								= '/civicrm/smartdebit/reconciliation/fixmissingcivi?reference_number='.$dao->reference_number;									
+		$fixmeelsemissing = CRM_Utils_System::url('civicrm/smartdebit/reconciliation/fixmissingcivi', "reference_number=".$dao->reference_number,  TRUE, NULL, FALSE, TRUE, TRUE);
+                $listArray[$dao->smart_debit_id]['fix_me_url']								= $fixmeelsemissing;								
               }
               $listArray[$dao->smart_debit_id]['recordFound']								= $transactionRecordFound;
               $listArray[$dao->smart_debit_id]['contact_id']								= $missingContactID;
@@ -354,7 +357,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
           $sql .= " LEFT JOIN civicrm_sd_refresh csd ON csd.reference_number = ctrc.trxn_id ";
 					$sql .= " WHERE opgr.name = 'payment_instrument' ";
 					$sql .= " AND   opva.label = 'Direct Debit' ";
-					$sql .= " AND   csd.id IS NULL LIMIT 20 ";
+					$sql .= " AND   csd.id IS NULL LIMIT 100 ";
          
 					$dao = CRM_Core_DAO::executeQuery( $sql );
 
