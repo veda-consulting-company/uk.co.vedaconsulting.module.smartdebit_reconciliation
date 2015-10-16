@@ -53,7 +53,23 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
      * @access public
      */
     function preProcess()
-  {
+      {
+	$group_name = "UK Direct Debit";
+	$sql  = " SELECT id ";
+	$sql .= " ,      name ";
+	$sql .= " ,      value ";
+	$sql .= " FROM civicrm_setting ";
+	$sql .= " WHERE group_name = %1 ";
+
+	$params = array( 1 => array( $group_name, 'String' ) );
+	$dao = CRM_Core_DAO::executeQuery( $sql, $params);
+	$directDebitArray = array();
+	while($dao->fetch()) {
+	  $directDebitArray[$dao->id]['id'] = $dao->id;
+	  $directDebitArray[$dao->id]['name'] = $dao->name;
+	  $directDebitArray[$dao->id]['value'] = unserialize($dao->value);
+	}
+	$this->assign( 'directDebitArray', $directDebitArray );
         parent::preProcess( );
         return false;
 

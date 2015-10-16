@@ -110,7 +110,8 @@ function smartdebit_civicrm_navigationMenu( &$params ) {
 
 function smartdebit_civicrm_pageRun(&$page) {
   $pageName = $page->getVar('_name');
-  if ($pageName == 'CRM_Contribute_Page_Tab') {
+  // To avoid standalone new contribution fail
+  if ($pageName == 'CRM_Contribute_Page_Tab' && $page->getVar('_contactId')) {
     $query = "
       SELECT cr.id, cr.trxn_id FROM civicrm_contribution_recur cr
       INNER JOIN civicrm_payment_processor cpp ON cpp.id = cr.payment_processor_id

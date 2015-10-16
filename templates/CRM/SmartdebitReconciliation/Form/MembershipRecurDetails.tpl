@@ -1,6 +1,6 @@
 <h3>{ts}Contact Membership and Contribution Recur{/ts}</h3>
 <div class="crm-form-block">
-  <table>
+  <table class="crm-info-panel">
 		
     <tr>
       <td>
@@ -9,23 +9,23 @@
       
     </tr>
         <tr>
-            <td class="label">{$form.first_name.label}</td>
+            <td>{$form.first_name.label}</td>
             <td>{$SDMandateArray.first_name}</td>
         </tr>
         <tr>
-            <td class="label">{$form.last_name.label}</td>
+            <td>{$form.last_name.label}</td>
             <td>{$SDMandateArray.last_name}</td>
         </tr>
         <tr>
-            <td class="label">{$form.email_address.label}</td>
+            <td>{$form.email_address.label}</td>
             <td>{$SDMandateArray.email_address}</td>
         </tr>
         <tr>
-            <td class="label">{$form.regular_amount.label}</td>
+            <td>{$form.regular_amount.label}</td>
             <td>{$SDMandateArray.regular_amount}</td>
         </tr>
         <tr>
-            <td class="label">{$form.start_date.label}</td>
+            <td>{$form.start_date.label}</td>
             <td>{$SDMandateArray.start_date}</td>
         </tr>
         <tr>
