@@ -296,7 +296,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
             $sql .= " LEFT JOIN civicrm_contribution_recur ctrc ON ctrc.trxn_id = csd1.reference_number";
             $sql .= " LEFT JOIN civicrm_contact cont ON cont.id = csd1.payerReference";                  
             $sql .= " WHERE ( csd1.current_state = %1 OR csd1.current_state = %2 ) ";                  
-            $sql .= " AND ctrc.id IS NULL LIMIT 20";
+            $sql .= " AND ctrc.id IS NULL LIMIT 100";
             $params = array( 1 => array( 10, 'Int' ), 2 => array(1, 'Int') );
             $dao = CRM_Core_DAO::executeQuery( $sql, $params);
             while ($dao->fetch()) {
@@ -357,7 +357,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
           $sql .= " LEFT JOIN civicrm_sd_refresh csd ON csd.reference_number = ctrc.trxn_id ";
 					$sql .= " WHERE opgr.name = 'payment_instrument' ";
 					$sql .= " AND   opva.label = 'Direct Debit' ";
-					$sql .= " AND   csd.id IS NULL LIMIT 20 ";
+					$sql .= " AND   csd.id IS NULL LIMIT 100 ";
          
 					$dao = CRM_Core_DAO::executeQuery( $sql );
 
