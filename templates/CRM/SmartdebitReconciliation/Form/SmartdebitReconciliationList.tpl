@@ -39,6 +39,7 @@
 	</p>      
       </div>
     </td>
+    {if $directDebitArray}
     <td>
       <div style="height:150px; overflow:auto;">
 	<h3>{ts}Direct Debit System Setting{/ts}</h3>
@@ -61,6 +62,7 @@
 	</table>
       </div>
     </td>
+    {/if}
   </tr>
 </table>
 {/if}
