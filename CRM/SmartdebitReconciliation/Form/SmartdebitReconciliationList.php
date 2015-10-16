@@ -268,7 +268,8 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
                   $listArray[$dao->smart_debit_id]['sd_contribution_status_id'] = $dao->current_state;
                   $listArray[$dao->smart_debit_id]['transaction_id']        = $dao->trxn_id;
                   $listArray[$dao->smart_debit_id]['differences']           = $differences;
-                  $listArray[$dao->smart_debit_id]['fix_me_url']						= '/civicrm/smartdebit/reconciliation/fixmissingcivi?cid='.$dao->contact_id.'&reference_number='.$dao->reference_number;				
+		  $fixmeurl = CRM_Utils_System::url('civicrm/smartdebit/reconciliation/fixmissingcivi', "cid=".$dao->contact_id."&reference_number=".$dao->reference_number,  TRUE, NULL, FALSE, TRUE, TRUE);
+                  $listArray[$dao->smart_debit_id]['fix_me_url']						= $fixmeurl;			
 //print_r($smartDebitRecord);
 //print_r($dao);
 //die;
@@ -306,11 +307,13 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
                 $differences.= ' But Contact Found Using Smart Debit payerReference '. $dao->payerReference;
                 $missingContactID = $dao->contact_id;
                 $missingContactName = $dao->display_name;
-                $listArray[$dao->smart_debit_id]['fix_me_url']								= '/civicrm/smartdebit/reconciliation/fixmissingcivi?cid='.$dao->contact_id.'&reference_number='.$dao->reference_number;				
+		$fixmemissing = CRM_Utils_System::url('civicrm/smartdebit/reconciliation/fixmissingcivi', "cid=".$dao->contact_id."&reference_number=".$dao->reference_number,  TRUE, NULL, FALSE, TRUE, TRUE);
+                $listArray[$dao->smart_debit_id]['fix_me_url']								= $fixmemissing;				
               } else {
                 $missingContactID = 0;
                 $missingContactName = $dao->first_name.' '.$dao->last_name;
-                $listArray[$dao->smart_debit_id]['fix_me_url']								= '/civicrm/smartdebit/reconciliation/fixmissingcivi?reference_number='.$dao->reference_number;									
+		$fixmeelsemissing = CRM_Utils_System::url('civicrm/smartdebit/reconciliation/fixmissingcivi', "reference_number=".$dao->reference_number,  TRUE, NULL, FALSE, TRUE, TRUE);
+                $listArray[$dao->smart_debit_id]['fix_me_url']								= $fixmeelsemissing;								
               }
               $listArray[$dao->smart_debit_id]['recordFound']								= $transactionRecordFound;
               $listArray[$dao->smart_debit_id]['contact_id']								= $missingContactID;
