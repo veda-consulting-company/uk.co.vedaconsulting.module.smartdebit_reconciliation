@@ -112,6 +112,10 @@ function smartdebit_civicrm_pageRun(&$page) {
   $pageName = $page->getVar('_name');
   // To avoid standalone new contribution fail
   if ($pageName == 'CRM_Contribute_Page_Tab' && $page->getVar('_contactId')) {
+    $paymentProcessorType   = CRM_Core_PseudoConstant::paymentProcessorType(false, null, 'name');
+    if(!CRM_Utils_Array::key('Smart Debit', $paymentProcessorType)) {
+      return;
+    }
     $query = "
       SELECT cr.id, cr.trxn_id FROM civicrm_contribution_recur cr
       INNER JOIN civicrm_payment_processor cpp ON cpp.id = cr.payment_processor_id
@@ -137,5 +141,6 @@ function smartdebit_civicrm_pageRun(&$page) {
     }
     $contributionRecurDetails = json_encode($contributionRecurDetails);
     $page->assign('contributionRecurDetails', $contributionRecurDetails);
+    $page->assign('smartdebit', TRUE);
   }
 }
