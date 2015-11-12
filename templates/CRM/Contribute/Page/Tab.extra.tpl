@@ -25,7 +25,7 @@
                 }
                 targetHtml = targetHtml.concat('</table>');
                 $(this).find('td:last').append('<span id= "smart_debit_details-' + recurId + '" class="action-item crm-hover-button">View Smart Debit</span>');
-                $('#smart_debit_details-'+ recurId).mouseover(function(){
+                $('#smart_debit_details-'+ recurId).click(function(){
                    $('#smart_debit_dialog').dialog({
                         title: "Smart Debit Details",
                         modal: true,
