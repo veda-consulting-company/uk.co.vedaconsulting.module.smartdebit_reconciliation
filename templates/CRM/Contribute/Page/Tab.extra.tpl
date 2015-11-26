@@ -2,7 +2,7 @@
 <div id="smart_debit_dialog" class="smart_debit_dialog" style="display:none;">
 </div>
 {if $action eq 16 and $permission EQ 'edit'}
-  <div style="display:none;">
+  <div id="smart_button_div" style="display:none;">
     {capture assign=directContribURL}{crmURL p="civicrm/directdebit/newdonation" q="reset=1&action=add&cid=`$contactId`&context=contribution&mode=live"}{/capture}
     <a accesskey="N" href="{$directContribURL}" id="smart_debit" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Submit Donation Direct Debit Contribution{/ts}</span></a>
   </div>
@@ -10,7 +10,12 @@
 {literal}
     <script type="text/javascript">
       CRM.$(function($) {
-      $('#smart_debit').insertAfter($('.action-link').find('.button'));
+	var buttonPresent = $('#smart_debit').is(":visible"); 
+	var action = {/literal}{$action}{literal};
+	if (buttonPresent == false && action == 16) {
+	   $('#smart_debit').insertAfter($('.CRM_Contribute_Form_Search div.action-link').find('.button'));
+	}
+	 
        var smartDetails = {/literal}{$contributionRecurDetails}{literal};
        $('.crm-entity').each(function(){
             var recurIdWithName = $(this).attr('id');
