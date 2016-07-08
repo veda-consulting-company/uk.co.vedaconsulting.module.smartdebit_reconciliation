@@ -82,17 +82,21 @@
 
         {foreach from=$listArray item=row}
             {assign var=id value=$row.id} 
+            {assign var=rContactId value=$row.contact_id}
+            {assign var=rContributionRecurId value=$row.contribution_recur_id}
+            {capture assign=recurContributionViewURL}{crmURL p='civicrm/contact/view/contributionrecur' q="reset=1&id=$rContributionRecurId&cid=$rContactId"}{/capture}
+            {capture assign=contactViewURL}{crmURL p='civicrm/contact/view' q="reset=1&cid=$rContactId"}{/capture}
             <tr class="{cycle values="odd-row,even-row"}">
                 <td>
 		{if $row.contribution_recur_id }
-                    <a href="/civicrm/contact/view/contributionrecur?reset=1&id={$row.contribution_recur_id}&cid={$row.contact_id}">{$row.transaction_id}</a>
+                    <a href="{$recurContributionViewURL}">{$row.transaction_id}</a>
                 {else}
                     {$row.transaction_id}
                 {/if}
                 </td>                
                 <td>
                 {if $row.contact_id gt 0}
-                    <a href="/civicrm/contact/view?cid={$row.contact_id}">{$row.contact_name}</a>
+                    <a href="{$contactViewURL}">{$row.contact_name}</a>
                 {else}
                     {$row.contact_name}
                 {/if}
