@@ -101,10 +101,6 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
      * @return void
      */
     function buildQuickForm( ) {
-      // KJ 11/06/2015 To avoid get all records from smart debit when page loads by default
-      if (CRM_Utils_Array::value('runSmartDebitRefresh', $_GET)) {
-        $insertSmartDebit = self::insertSmartDebitToTable();
-      }
       
       // FOr smart debit sync purpose
         $sync = CRM_Utils_Array::value('sync', $_GET, '');
@@ -857,7 +853,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
       return 0;
     }
     
-    function insertSmartDebitToTable() {
+    static function insertSmartDebitToTable() {
       // If no civicrm_sd, then create that table
       if(!CRM_Core_DAO::checkTableExists('civicrm_sd_refresh')) {
         $creatSql = "CREATE TABLE `civicrm_sd_refresh` (
@@ -892,8 +888,14 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
       $emptySql = "TRUNCATE TABLE `civicrm_sd_refresh`";
       CRM_Core_DAO::executeQuery($emptySql);
     }
+    CRM_Core_Error::debug_var('CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList getSmartDebitPayments All', 'Started');
     $smartDebitArray = self::getSmartDebitPayments(NULL);
+    CRM_Core_Error::debug_var('CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList getSmartDebitPayments All', 'Ended');
     CRM_Core_Error::debug_var('smart debit array count', count($smartDebitArray));
+    CRM_Core_Error::debug_var('CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList Insert Into civicrm_sd_refresh table', 'Started');
+    if (empty($smartDebitArray)) {
+      return FALSE;
+    }
     foreach ($smartDebitArray as $key => $smartDebitRecord) {
       $sql = "INSERT INTO `civicrm_sd_refresh`(
             `title`,
@@ -939,5 +941,8 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
      // CRM_Core_Error::debug_var('$params', $params);
       CRM_Core_DAO::executeQuery($sql, $params);
     }
+    CRM_Core_Error::debug_var('CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList Insert Into civicrm_sd_refresh table', 'Ended');
+    $mandateFetchedCount = count($smartDebitArray);
+    return $mandateFetchedCount;
   }
 }
