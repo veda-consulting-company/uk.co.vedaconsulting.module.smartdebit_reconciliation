@@ -892,10 +892,10 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
     $smartDebitArray = self::getSmartDebitPayments(NULL);
     CRM_Core_Error::debug_var('CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList getSmartDebitPayments All', 'Ended');
     CRM_Core_Error::debug_var('smart debit array count', count($smartDebitArray));
-    CRM_Core_Error::debug_var('CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList Insert Into civicrm_sd_refresh table', 'Started');
     if (empty($smartDebitArray)) {
       return FALSE;
     }
+    CRM_Core_Error::debug_var('CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList Insert Into civicrm_sd_refresh table', 'Started');
     foreach ($smartDebitArray as $key => $smartDebitRecord) {
       $sql = "INSERT INTO `civicrm_sd_refresh`(
             `title`,
