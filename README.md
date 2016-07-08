@@ -35,13 +35,11 @@
 
 <p dir="ltr" style="line-height:1.656;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-4b17e2cd-5577-e49e-c525-bbaae8554852"><span style="font-size: 14.6667px; font-family: Arial; color: rgb(0, 0, 0); vertical-align: baseline; white-space: pre-wrap;">1. Install </span><a href="https://github.com/veda-consulting/uk.co.vedaconsulting.module.smartdebit_reconciliation" style="text-decoration:none;"><span style="font-size: 14.6667px; font-family: Arial; color: rgb(17, 85, 204); text-decoration: underline; vertical-align: baseline; white-space: pre-wrap;">https://github.com/veda-consulting/uk.co.vedaconsulting.module.smartdebit_reconciliation </span></a><span style="font-size: 14.6667px; font-family: Arial; color: rgb(0, 0, 0); vertical-align: baseline; white-space: pre-wrap;">extension on your CiviCRM set up</span></span></p>
 
-<p>&nbsp;</p>
+<p>&nbsp;</p><p dir="ltr" style="line-height:1.656;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-4b17e2cd-5577-e49e-c525-bbaae8554852"><span style="font-size: 14.6667px; font-family: Arial; color: rgb(0, 0, 0); vertical-align: baseline; white-space: pre-wrap;">2. Have 'Refresh civicrm_sd_refresh table with latest Smart Debit Mandates' schedule job running</span></span></p>
 
-<p dir="ltr" style="line-height:1.656;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-4b17e2cd-5577-e49e-c525-bbaae8554852"><span style="font-size: 14.6667px; font-family: Arial; color: rgb(0, 0, 0); vertical-align: baseline; white-space: pre-wrap;">2. Access the extension (http://&lt;domain&gt;/civicrm/smartdebit/reconciliation/list)</span></span></p>
+<p dir="ltr" style="line-height:1.656;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-4b17e2cd-5577-e49e-c525-bbaae8554852"><span style="font-size: 14.6667px; font-family: Arial; color: rgb(0, 0, 0); vertical-align: baseline; white-space: pre-wrap;">3. Access the extension (http://&lt;domain&gt;/civicrm/smartdebit/reconciliation/list)</span></span></p>
 
 <p dir="ltr" style="line-height:1.656;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-4b17e2cd-5577-e49e-c525-bbaae8554852"><span style="font-size: 14.6667px; font-family: Arial; color: rgb(0, 0, 0); vertical-align: baseline; white-space: pre-wrap;"><img alt="home page.png" height="137" src="https://lh3.googleusercontent.com/Fjxrhr1fA_glxWiUqNDtN6By-mBCTOTdzmHFiLw7hEJVEe-BK3or4w8_O12LnJlPfdY4srVw-mLodgi92owqmKbcNSc8n7oeMLTwbdR_14fIQW7exOFkmbjLrKad0SAF7RKj8EQ" style="border: none; transform: rotate(0.00rad); -webkit-transform: rotate(0.00rad);" width="602" /></span></span></p>
-
-<p dir="ltr" style="line-height:1.656;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-4b17e2cd-5577-e49e-c525-bbaae8554852"><span style="font-size: 14.6667px; font-family: Arial; color: rgb(0, 0, 0); vertical-align: baseline; white-space: pre-wrap;">3. Pull all smart debit mandates to temp table (http://&lt;domain&gt;/civicrm/smartdebit/reconciliation/list?runSmartDebitRefresh=1)</span></span></p>
 
 <p>&nbsp;</p>
 
