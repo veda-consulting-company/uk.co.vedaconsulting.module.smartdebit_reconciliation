@@ -29,7 +29,6 @@
     <td>
       <div style="height:150px; overflow:auto;">
 	<p>
-	  <a href="{crmURL p='civicrm/smartdebit/reconciliation/list' q='runSmartDebitRefresh=1' h=0}">Run Smart Debit List</a><br />
 	  <a href="{crmURL p='civicrm/smartdebit/reconciliation/list' q='checkMissingFromCivi=1' h=0}">Show All Mandates Missing from CiviCRM</a><br />
 	  <a href="{crmURL p='civicrm/smartdebit/reconciliation/list' q='checkMissingFromSD=1' h=0}">Show All Mandates Missing from Smart Debit</a><br />
 	  <a href="{crmURL p='civicrm/smartdebit/reconciliation/list' q='checkAmount=1' h=0}">Show All Mandates with Differing Amounts</a><br />
