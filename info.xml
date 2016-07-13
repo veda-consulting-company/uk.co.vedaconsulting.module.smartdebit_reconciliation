@@ -15,8 +15,8 @@
     <author>Veda Consulting</author>
     <email>parvez@vedaconsulting.co.uk</email>
   </maintainer>
-  <releaseDate>2016-07-08</releaseDate>
-  <version>2.9.5</version>
+  <releaseDate>2016-07-13</releaseDate>
+  <version>2.9.6</version>
   <develStage>stable</develStage>
   <compatibility>
     <ver>4.6</ver>

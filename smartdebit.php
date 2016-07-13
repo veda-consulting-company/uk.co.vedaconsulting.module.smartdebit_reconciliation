@@ -134,9 +134,11 @@ function smartdebit_civicrm_pageRun(&$page) {
     $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
     $contributionRecurDetails = array();
     while ($dao->fetch()) {
-      $smartDebitResponse = CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList::getSmartDebitPayments($dao->trxn_id);
-      foreach ($smartDebitResponse[0] as $key => $value) {
-        $contributionRecurDetails[$dao->id][$key] = $value;
+      if ($dao->trxn_id) {
+        $smartDebitResponse = CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList::getSmartDebitPayments($dao->trxn_id);
+        foreach ($smartDebitResponse[0] as $key => $value) {
+          $contributionRecurDetails[$dao->id][$key] = $value;
+        }
       }
     }
     $contributionRecurDetails = json_encode($contributionRecurDetails);
