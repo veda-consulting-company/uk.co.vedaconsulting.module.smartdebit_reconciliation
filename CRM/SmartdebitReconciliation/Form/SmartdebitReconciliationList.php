@@ -52,27 +52,23 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
      * @return void
      * @access public
      */
-    function preProcess()
-      {
-	$group_name = "UK Direct Debit";
-	$sql  = " SELECT id ";
-	$sql .= " ,      name ";
-	$sql .= " ,      value ";
-	$sql .= " FROM civicrm_setting ";
-	$sql .= " WHERE group_name = %1 ";
+    function preProcess() {
+        require_once('CRM/DirectDebit/Form/DirectDebitList.php');
 
-	$params = array( 1 => array( $group_name, 'String' ) );
-	$dao = CRM_Core_DAO::executeQuery( $sql, $params);
-	$directDebitArray = array();
-	while($dao->fetch()) {
-	  $directDebitArray[$dao->id]['id'] = $dao->id;
-	  $directDebitArray[$dao->id]['name'] = $dao->name;
-	  $directDebitArray[$dao->id]['value'] = unserialize($dao->value);
-	}
-	$this->assign( 'directDebitArray', $directDebitArray );
+        $settingNames = CRM_DirectDebit_Form_DirectDebitList::getDirectDebitSettingNames();
+        $directDebitArray = array();
+        foreach ($settingNames as $settingName) {
+            //get id and value for this setting name
+            list($id, $value) = CRM_DirectDebit_Form_DirectDebitList::getIdAndValueFromSettingName($settingName);
+            $directDebitArray[$id]['id'] = $id;
+            $directDebitArray[$id]['name'] = $settingName;
+            $directDebitArray[$id]['value'] = unserialize($value);
+        }
+
+        $this->assign( 'directDebitArray', $directDebitArray );
+
         parent::preProcess( );
         return false;
-
     }
 
 /* Smart Debit parameters
@@ -127,7 +123,6 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
               CRM_Utils_Array::value('checkFrequency', $_GET) ||
               CRM_Utils_Array::value('checkStatus', $_GET) ||
               CRM_Utils_Array::value('checkPayerReference', $_GET) ) {
-            $group_name = "CiviCRM Preferences";
 
             $sql  = " SELECT ctrc.id contribution_recur_id ";
             $sql .= " , ctrc.contact_id ";
