@@ -15,11 +15,11 @@
     <author>Veda Consulting</author>
     <email>parvez@vedaconsulting.co.uk</email>
   </maintainer>
-  <releaseDate>2016-07-14</releaseDate>
-  <version>2.9.7</version>
+  <releaseDate>2017-02-09</releaseDate>
+  <version>2.10</version>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>4.6</ver>
+    <ver>4.7</ver>
   </compatibility>
   <comments></comments>
   <civix>

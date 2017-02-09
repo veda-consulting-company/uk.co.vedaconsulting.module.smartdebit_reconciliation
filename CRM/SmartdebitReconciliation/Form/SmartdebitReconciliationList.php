@@ -46,31 +46,6 @@ require_once 'CRM/Core/Session.php';
 
 class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM_Core_Form {
 
-    /**
-     * build all the data structures needed to build the form
-     *
-     * @return void
-     * @access public
-     */
-    function preProcess() {
-        require_once('CRM/DirectDebit/Form/DirectDebitList.php');
-
-        $settingNames = CRM_DirectDebit_Form_DirectDebitList::getDirectDebitSettingNames();
-        $directDebitArray = array();
-        foreach ($settingNames as $settingName) {
-            //get id and value for this setting name
-            list($id, $value) = CRM_DirectDebit_Form_DirectDebitList::getIdAndValueFromSettingName($settingName);
-            $directDebitArray[$id]['id'] = $id;
-            $directDebitArray[$id]['name'] = $settingName;
-            $directDebitArray[$id]['value'] = unserialize($value);
-        }
-
-        $this->assign( 'directDebitArray', $directDebitArray );
-
-        parent::preProcess( );
-        return false;
-    }
-
 /* Smart Debit parameters
   address_3 (String, 0 characters )
   first_name (String, 9 characters ) simon1008

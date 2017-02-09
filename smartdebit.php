@@ -6,21 +6,7 @@ require_once 'smartdebit.civix.php';
  * Implementation of hook_civicrm_config
  */
 function smartdebit_civicrm_config(&$config) {
-    $template =& CRM_Core_Smarty::singleton( );
-
-    $batchingRoot = dirname( __FILE__ );
-
-    $batchingDir = $batchingRoot . DIRECTORY_SEPARATOR . 'templates';
-
-    if ( is_array( $template->template_dir ) ) {
-        array_unshift( $template->template_dir, $batchingDir );
-    } else {
-        $template->template_dir = array( $batchingDir, $template->template_dir );
-    }
-
-    // also fix php include path
-    $include_path = $batchingRoot . PATH_SEPARATOR . get_include_path( );
-    set_include_path( $include_path );
+  _smartdebit_civix_civicrm_config($config);
 }
 
 /**
@@ -29,7 +15,7 @@ function smartdebit_civicrm_config(&$config) {
  * @param $files array(string)
  */
 function smartdebit_civicrm_xmlMenu(&$files) {
-    $files[] = dirname(__FILE__)."/xml/Menu/SmartdebitReconciliation.xml";
+  _smartdebit_civix_civicrm_xmlMenu($files);
 }
 
 /**
@@ -84,28 +70,27 @@ function smartdebit_civicrm_managed(&$entities) {
 }
 
 function smartdebit_civicrm_navigationMenu( &$params ) {
-    #Get the maximum key of $params
-    $maxKey = max(array_keys($params)); 
-		
-    #set settings navigation Id 
-    $sdReconciliationId = $maxKey+1;
-    
-    #set navigation menu
-	$parentId         = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Navigation', 'Administer', 'id', 'name');
-	$civiContributeId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Navigation', 'CiviContribute', 'id', 'name');
-  $params[$parentId]['child'][$civiContributeId]['child'][$sdReconciliationId]= array(
-                          'attributes' => array (
-                                            'label'      => 'Smart Debit Reconciliation',
-                                            'name'       => 'Smart Debit Reconciliation',
-                                            'url'        => 'civicrm/smartdebit/reconciliation/list?reset=1',
-                                            'permission' => 'administer CiviCRM',
-                                            'operator'   => null,
-                                            'separator'  => null,
-                                            'parentID'   => $parentId,
-                                            'navID'      => $sdReconciliationId,
-                                            'active'     => 1
-                                            )
-                        );
+  // get the id of Administer Menu
+  $administerMenuId = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_Navigation', 'Administer', 'id', 'name');
+
+  // skip adding menu if there is no administer menu
+  if ($administerMenuId) {
+    // get the maximum key under adminster menu
+    $maxKey = max( array_keys($params[$administerMenuId]['child']));
+    $params[$administerMenuId]['child'][$maxKey+1] =  array (
+      'attributes' => array (
+        'label' => 'Smart Debit Reconciliation',
+        'name' => 'Smart Debit Reconciliation',
+        'url' => 'civicrm/smartdebit/reconciliation/list?reset=1',
+        'permission' => 'administer CiviCRM',
+        'operator'   => NULL,
+        'separator'  => TRUE,
+        'parentID'   => $administerMenuId,
+        'navID'      => $maxKey+1,
+        'active'     => 1
+      )
+    );
+  }
 }
 
 function smartdebit_civicrm_pageRun(&$page) {
