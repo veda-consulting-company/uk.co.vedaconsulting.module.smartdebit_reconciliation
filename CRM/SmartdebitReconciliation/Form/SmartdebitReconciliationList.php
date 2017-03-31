@@ -578,7 +578,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
 		 * The code was pulled from the PostProcess hook code in the Direct Debit extension removing anything unecessary
 		 */
 		function repair_corrupt_in_civicrm_record($params) {
-			require_once 'UK_Direct_Debit/Form/Main.php';
+			require_once 'CRM/DirectDebit/Form/Main.php';
 
       $aContribValue  = array();
       $aContribParam  = array( 'contact_id' => $form->_contactID );
@@ -665,7 +665,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
         }
       }
 
-      require_once 'UK_Direct_Debit/Form/Main.php';
+      require_once 'CRM/DirectDebit/Form/Main/php';
       
       // Get the Smart Debit details for the payer
       $smartDebitResponse = self::getSmartDebitPayments($params['payer_reference']);
@@ -678,7 +678,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
         $params['recur_next_payment_date'] = $smartDebitRecord['start_date'].' 00:00:00';
         $params['recur_frequency_unit'] = self::translateSmartDebitFrequencyUnit($smartDebitRecord['frequency_type']);
         $params['payment_processor_id'] = self::getSmartDebitPaymentProcessorID();
-        $params['payment_instrument_id'] = UK_Direct_Debit_Form_Main::getDDPaymentInstrumentID();
+        $params['payment_instrument_id'] = CRM_DirectDebit_Form_Main::getDDPaymentInstrumentID();
         $params['trxn_id'] = $params['payer_reference'];
         $params['current_state'] = $smartDebitRecord['current_state'];
         list($y, $m, $d) = explode('-', $smartDebitRecord['start_date']);
