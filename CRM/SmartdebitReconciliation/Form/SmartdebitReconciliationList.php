@@ -379,7 +379,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
 
   static function getAllSmartDebitPayments() {
     $paymentProcessorType = CRM_Core_PseudoConstant::paymentProcessorType(false, null, 'name');
-    $paymentProcessorTypeId = CRM_Utils_Array::key('Smart Debit', $paymentProcessorType);
+    $paymentProcessorTypeId = CRM_Utils_Array::key('Smart_Debit', $paymentProcessorType);
   
       $sql  = " SELECT user_name ";
       $sql .= " ,      password ";
@@ -433,7 +433,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
       return;
     }
     $paymentProcessorType = CRM_Core_PseudoConstant::paymentProcessorType(false, null, 'name');
-    $paymentProcessorTypeId = CRM_Utils_Array::key('Smart Debit', $paymentProcessorType);
+    $paymentProcessorTypeId = CRM_Utils_Array::key('Smart_Debit', $paymentProcessorType);
   
       $sql  = " SELECT user_name ";
       $sql .= " ,      password ";

@@ -98,7 +98,7 @@ function smartdebit_civicrm_pageRun(&$page) {
   // To avoid standalone new contribution fail
   if ($pageName == 'CRM_Contribute_Page_Tab' && $page->getVar('_contactId')) {
     $paymentProcessorType   = CRM_Core_PseudoConstant::paymentProcessorType(false, null, 'name');
-    if(!CRM_Utils_Array::key('Smart Debit', $paymentProcessorType)) {
+    if(!CRM_Utils_Array::key('Smart_Debit', $paymentProcessorType)) {
       return;
     }
     $query = "
@@ -110,7 +110,7 @@ function smartdebit_civicrm_pageRun(&$page) {
       WHERE cppt.name = %1 AND cr.contact_id = %2 AND opgr.name = %3 AND opva.label = %4";
     
     $queryParams = array (
-      1 => array('Smart Debit', 'String'),
+      1 => array('Smart_Debit', 'String'),
       2 => array($page->getVar('_contactId'), 'Int'),
       3 => array('payment_instrument', 'String'),
       4 => array('Direct Debit', 'String'),
