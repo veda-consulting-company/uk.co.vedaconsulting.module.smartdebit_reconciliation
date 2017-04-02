@@ -8,8 +8,7 @@ Class CRM_SmartdebitReconciliation_Page_RepairCorruptRecurring extends CRM_Core_
 		$get   = $_GET;
 		$cid   = $get['cid'];
 		$payer_reference = $get['reference_number'];
-		$this->assign('payer_reference', $reference_number);
-		
+		$this->assign('payer_reference', $payer_reference);
 
 		$params = array();
 		
@@ -44,9 +43,6 @@ Class CRM_SmartdebitReconciliation_Page_RepairCorruptRecurring extends CRM_Core_
 		}
 		$params['payer_reference'] = $payer_reference;
 		// Check the details are correct and everything has been passed over
-		
-		// Call the routine that will fix everything
-		require_once 'CRM/SmartdebitReconciliation/Form/SmartdebitReconciliationList.php';
 
 		// Then Call the IPN code i.e. we're pretending we've just completed the smart debit call and firing the code that was in the 
 		CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList::repair_corrupt_in_civicrm_record($params);
@@ -54,6 +50,5 @@ Class CRM_SmartdebitReconciliation_Page_RepairCorruptRecurring extends CRM_Core_
 		$params = sprintf('reset=1&cid=%d', $cid);
     $url = CRM_Utils_System::url('civicrm/contact/view',$params);
     CRM_Utils_System::redirect($url);
-
 	}
 }
