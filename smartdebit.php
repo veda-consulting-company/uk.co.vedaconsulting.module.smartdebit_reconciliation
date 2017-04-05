@@ -120,7 +120,7 @@ function smartdebit_civicrm_pageRun(&$page) {
     $contributionRecurDetails = array();
     while ($dao->fetch()) {
       if ($dao->trxn_id) {
-        $smartDebitResponse = CRM_DirectDebit_Form_Sync::getSmartDebitPayerContactDetails($dao->trxn_id);
+        $smartDebitResponse = CRM_DirectDebit_Sync::getSmartDebitPayerContactDetails($dao->trxn_id);
         foreach ($smartDebitResponse[0] as $key => $value) {
           $contributionRecurDetails[$dao->id][$key] = $value;
         }

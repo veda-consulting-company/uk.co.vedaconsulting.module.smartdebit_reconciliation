@@ -422,7 +422,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
     }
 
     // Get the Smart Debit details for the payer
-    $smartDebitResponse = CRM_DirectDebit_Form_Sync::getSmartDebitPayerContactDetails($params['payer_reference']);
+    $smartDebitResponse = CRM_DirectDebit_Sync::getSmartDebitPayerContactDetails($params['payer_reference']);
 
     foreach ($smartDebitResponse as $key => $smartDebitRecord) {
       // Setup params for the relevant rec
@@ -649,7 +649,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
       CRM_Core_DAO::executeQuery($emptySql);
     }
     CRM_Core_Error::debug_var('CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList getSmartDebitPayments All', 'Started');
-    $smartDebitArray = CRM_DirectDebit_Form_Sync::getSmartDebitPayerContactDetails();
+    $smartDebitArray = CRM_DirectDebit_Sync::getSmartDebitPayerContactDetails();
     CRM_Core_Error::debug_var('CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList getSmartDebitPayments All', 'Ended');
     CRM_Core_Error::debug_var('smart debit array count', count($smartDebitArray));
     if (empty($smartDebitArray)) {
