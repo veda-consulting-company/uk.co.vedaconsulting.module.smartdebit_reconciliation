@@ -37,7 +37,7 @@ class CRM_SmartdebitReconciliation_Form_MembershipRecurDetails extends CRM_Core_
      // Get the smart Debit mandate details
 		 require_once 'CRM/SmartdebitReconciliation/Form/SmartdebitReconciliationList.php';
      if (CRM_Utils_Array::value('reference_number', $_GET)) {
-      $smartDebitResponse = CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList::getSmartDebitPayments(CRM_Utils_Array::value('reference_number', $_GET));
+      $smartDebitResponse = CRM_DirectDebit_Form_Sync::getSmartDebitPayerContactDetails(CRM_Utils_Array::value('reference_number', $_GET));
       $smartDebitMandate = $smartDebitResponse[0];
       $this->assign( 'SDMandateArray', $smartDebitMandate );
      }

@@ -196,7 +196,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
         if ($different) {
           $financialType = '';
           if ($dao->financial_type_id) {
-            $financialType  = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $dao->financial_type_id, 'name', 'id');
+            $financialType = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $dao->financial_type_id, 'name', 'id');
           }
 
           $listArray[$dao->smart_debit_id]['recordFound']           = $transactionRecordFound;
@@ -333,104 +333,6 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
     $this->assign( 'listArray', $newListArray );
   }
 
-  static function getAllSmartDebitPayments() {
-    $paymentProcessorType = CRM_Core_PseudoConstant::paymentProcessorType(false, null, 'name');
-    $paymentProcessorTypeId = CRM_Utils_Array::key('Smart_Debit', $paymentProcessorType);
-
-    $sql  = " SELECT user_name ";
-    $sql .= " ,      password ";
-    $sql .= " ,      signature ";
-    $sql .= " FROM civicrm_payment_processor ";
-    $sql .= " WHERE payment_processor_type_id = %1 ";
-    $sql .= " AND is_test= %2 ";
-
-    $params = array( 1 => array( $paymentProcessorTypeId, 'Integer' )
-    , 2 => array( '0', 'Int' )
-    );
-    $dao = CRM_Core_DAO::executeQuery( $sql, $params);
-
-    if ($dao->fetch()) {
-
-      $username = $dao->user_name;
-      $password = $dao->password;
-      $pslid    = $dao->signature;
-    }
-
-    // Send payment POST to the target URL
-    $url = CRM_DirectDebit_Base::getApiUrl('/api/data/dump', "query[service_user][pslid]=$pslid&query[report_format]=XML");
-    $response = CRM_DirectDebit_Base::requestPost($url, '', $username, $password, '');
-
-    // Take action based upon the response status
-    switch ( strtoupper( $response["Status"] ) ) {
-      case 'OK':
-        $smartDebitArray = array();
-        // Cater for a single response
-        if (isset($response['Data']['PayerDetails']['@attributes'])) {
-          $smartDebitArray[] = $response['Data']['PayerDetails']['@attributes'];
-        } else {
-          foreach ($response['Data']['PayerDetails'] as $key => $value) {
-            $smartDebitArray[] = $value['@attributes'];
-          }
-        }
-        return $smartDebitArray;
-      default:
-        return false;
-    }
-  }
-
-  static function getSmartDebitPayments($referenceNumber) {
-    if (empty($referenceNumber)) {
-      return;
-    }
-    $paymentProcessorType = CRM_Core_PseudoConstant::paymentProcessorType(false, null, 'name');
-    $paymentProcessorTypeId = CRM_Utils_Array::key('Smart_Debit', $paymentProcessorType);
-
-    $sql  = " SELECT user_name ";
-    $sql .= " ,      password ";
-    $sql .= " ,      signature ";
-    $sql .= " FROM civicrm_payment_processor ";
-    $sql .= " WHERE payment_processor_type_id = %1 ";
-    $sql .= " AND is_test= %2 ";
-
-    $params = array( 1 => array( $paymentProcessorTypeId, 'Integer' )
-    , 2 => array( '0', 'Int' )
-    );
-
-    $dao = CRM_Core_DAO::executeQuery( $sql, $params);
-
-    if ($dao->fetch()) {
-      $username = $dao->user_name;
-      $password = $dao->password;
-      $pslid    = $dao->signature;
-    }
-
-    // Send payment POST to the target URL
-    $url = CRM_DirectDebit_Base::getApiUrl('/api/data/dump', "query[service_user][pslid]=$pslid&query[report_format]=XML");
-
-    // Restrict to a single payer if we have a reference
-    if ($referenceNumber) {
-      $url .= "&query[reference_number]=".rawurlencode($referenceNumber);
-    }
-    $response = CRM_DirectDebit_Base::requestPost($url, '', $username, $password, '');
-
-    // Take action based upon the response status
-    switch ( strtoupper( $response["Status"] ) ) {
-      case 'OK':
-        $smartDebitArray = array();
-        // Cater for a single response
-        if (isset($response['Data']['PayerDetails']['@attributes'])) {
-          $smartDebitArray[] = $response['Data']['PayerDetails']['@attributes'];
-        } else {
-          foreach ($response['Data']['PayerDetails'] as $key => $value) {
-            $smartDebitArray[] = $value['@attributes'];
-          }
-        }
-        return $smartDebitArray;
-      default:
-        return false;
-    }
-  }
-
   static function getCleanSmartDebitAmount($smartDebitAmount) {
     return(substr($smartDebitAmount, 2));
   }
@@ -520,7 +422,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
     }
 
     // Get the Smart Debit details for the payer
-    $smartDebitResponse = self::getSmartDebitPayments($params['payer_reference']);
+    $smartDebitResponse = CRM_DirectDebit_Form_Sync::getSmartDebitPayerContactDetails($params['payer_reference']);
 
     foreach ($smartDebitResponse as $key => $smartDebitRecord) {
       // Setup params for the relevant rec
@@ -529,8 +431,8 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
       $params['amount'] = self::getCleanSmartDebitAmount($smartDebitRecord['regular_amount']);
       $params['recur_start_date'] = $smartDebitRecord['start_date'].' 00:00:00';
       $params['recur_next_payment_date'] = $smartDebitRecord['start_date'].' 00:00:00';
-      $params['payment_processor_id'] = self::getSmartDebitPaymentProcessorID();
-      $params['payment_instrument_id'] = CRM_DirectDebit_Base::getDDPaymentInstrumentID();
+      $params['payment_processor_id'] = CRM_Core_Payment_Smartdebitdd::getSmartDebitPaymentProcessorID();
+      $params['payment_instrument_id'] = CRM_DirectDebit_Base::getDefaultPaymentInstrumentID();
       $params['trxn_id'] = $params['payer_reference'];
       $params['current_state'] = $smartDebitRecord['current_state'];
       list($y, $m, $d) = explode('-', $smartDebitRecord['start_date']);
@@ -711,20 +613,6 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
     $daoMembershipType = CRM_Core_DAO::executeQuery( $selectDDSql, $selectDDParams );
   }
 
-  static function getSmartDebitPaymentProcessorID() {
-    // Get all contacts who have the tag set
-    $selectSql     =  " SELECT id";
-    $selectSql     .= " FROM civicrm_payment_processor cpp ";
-    $selectSql     .= " WHERE cpp.class_name = %1 AND cpp.is_test = 0";
-    $selectParams  = array( 1 => array( 'uk.co.vedaconsulting.payment.smartdebitdd' , 'String' ) );
-    $dao           = CRM_Core_DAO::executeQuery( $selectSql, $selectParams );
-
-    while ($dao->fetch()) {
-      return $dao->id;
-    }
-    return 0;
-  }
-
   static function insertSmartDebitToTable() {
     // If no civicrm_sd, then create that table
     if(!CRM_Core_DAO::checkTableExists('civicrm_sd_refresh')) {
@@ -761,7 +649,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
       CRM_Core_DAO::executeQuery($emptySql);
     }
     CRM_Core_Error::debug_var('CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList getSmartDebitPayments All', 'Started');
-    $smartDebitArray = self::getAllSmartDebitPayments();
+    $smartDebitArray = CRM_DirectDebit_Form_Sync::getSmartDebitPayerContactDetails();
     CRM_Core_Error::debug_var('CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList getSmartDebitPayments All', 'Ended');
     CRM_Core_Error::debug_var('smart debit array count', count($smartDebitArray));
     if (empty($smartDebitArray)) {
