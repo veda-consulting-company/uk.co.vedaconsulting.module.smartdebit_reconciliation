@@ -129,7 +129,6 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
 
       // Remove first 2 characters (Ascii characters 194 & 163)
       while ($dao->fetch()) {
-        $regularAmount = self::getCleanSmartDebitAmount($dao->regular_amount);
         // Smart Debit Record Found
         // 1. Transaction Id in Smart Debit and Civi for the same contact
 
@@ -141,7 +140,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
 
         if ($checkAmount) {
           // Check that amount in CiviCRM matches amount in Smart Debit
-          if ($regularAmount != $dao->amount) {
+          if ($dao->regular_amount != $dao->amount) {
             $different = true;
             $differences .= 'Amount';
             $separator = $separatorCharacter;
@@ -223,7 +222,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
           $listArray[$dao->smart_debit_id]['frequency']             = $dao->frequency_unit;
           $listArray[$dao->smart_debit_id]['sd_frequency']          = $dao->frequency_type;
           $listArray[$dao->smart_debit_id]['amount']                = $dao->amount;
-          $listArray[$dao->smart_debit_id]['sd_amount']             = $regularAmount;
+          $listArray[$dao->smart_debit_id]['sd_amount']             = $dao->regular_amount;
           $listArray[$dao->smart_debit_id]['contribution_status_id']    = $dao->contribution_status_id;
           $listArray[$dao->smart_debit_id]['sd_contribution_status_id'] = $dao->current_state;
           $listArray[$dao->smart_debit_id]['transaction_id']        = $dao->trxn_id;
@@ -269,7 +268,6 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
       $dao = CRM_Core_DAO::executeQuery( $sql, $params);
       while ($dao->fetch()) {
         $differences = 'Transaction: ' .$dao->reference_number. ' not Found in Civi';
-        $regularAmount = self::getCleanSmartDebitAmount($dao->regular_amount);
         $transactionRecordFound = false;
 
         // Add records with no valid contact ID
@@ -287,21 +285,18 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
           $fixmeUrl = CRM_Utils_System::url('civicrm/smartdebit/reconciliation/fixmissingcivi', "reference_number=".$dao->reference_number,  TRUE, NULL, FALSE, TRUE, TRUE);
         }
         // Add the record
-        if ((!empty($regularAmount) && $hasAmount) || (empty($regularAmount) && !$hasAmount)) {
-          // FIXME: We use this if because amount is sometimes set to "LL" for some reason!
-          $listArray[$dao->smart_debit_id]['fix_me_url'] = $fixmeUrl;
-          $listArray[$dao->smart_debit_id]['recordFound'] = $transactionRecordFound;
-          $listArray[$dao->smart_debit_id]['contact_id'] = $missingContactID;
-          $listArray[$dao->smart_debit_id]['contact_name'] = $missingContactName;
-          $listArray[$dao->smart_debit_id]['differences'] = $differences;
-          $listArray[$dao->smart_debit_id]['sd_contact_id'] = $dao->payerReference;
-          $listArray[$dao->smart_debit_id]['sd_start_date'] = $dao->start_date;
-          $listArray[$dao->smart_debit_id]['sd_frequency'] = $dao->frequency_type;
-          $listArray[$dao->smart_debit_id]['sd_amount'] = $regularAmount;
-          $listArray[$dao->smart_debit_id]['sd_contribution_status_id'] = $dao->current_state;
-          $listArray[$dao->smart_debit_id]['transaction_id'] = $dao->reference_number;
-          $listArray[$dao->smart_debit_id]['sd_frequency'] = $dao->frequency_type;
-        }
+        $listArray[$dao->smart_debit_id]['fix_me_url'] = $fixmeUrl;
+        $listArray[$dao->smart_debit_id]['recordFound'] = $transactionRecordFound;
+        $listArray[$dao->smart_debit_id]['contact_id'] = $missingContactID;
+        $listArray[$dao->smart_debit_id]['contact_name'] = $missingContactName;
+        $listArray[$dao->smart_debit_id]['differences'] = $differences;
+        $listArray[$dao->smart_debit_id]['sd_contact_id'] = $dao->payerReference;
+        $listArray[$dao->smart_debit_id]['sd_start_date'] = $dao->start_date;
+        $listArray[$dao->smart_debit_id]['sd_frequency'] = $dao->frequency_type;
+        $listArray[$dao->smart_debit_id]['sd_amount'] = $dao->regular_amount;
+        $listArray[$dao->smart_debit_id]['sd_contribution_status_id'] = $dao->current_state;
+        $listArray[$dao->smart_debit_id]['transaction_id'] = $dao->reference_number;
+        $listArray[$dao->smart_debit_id]['sd_frequency'] = $dao->frequency_type;
 
         // We've found a contact id matching that in smart debit
         // Need to determine if its a correupt renewal or something
@@ -721,8 +716,8 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
         8 => array( self::getArrayFieldValue($smartDebitRecord, 'town', 'NULL'), 'String' ),
         9 => array( self::getArrayFieldValue($smartDebitRecord, 'county', 'NULL'), 'String' ),
         10 => array( self::getArrayFieldValue($smartDebitRecord, 'postcode', 'NULL'), 'String' ),
-        11 => array( self::getArrayFieldValue($smartDebitRecord, 'first_amount', 'NULL'), 'String' ),
-        12 => array( self::getArrayFieldValue($smartDebitRecord, 'regular_amount', 'NULL'), 'String' ),
+        11 => array( self::getCleanSmartDebitAmount(self::getArrayFieldValue($smartDebitRecord, 'first_amount', 'NULL')), 'String' ),
+        12 => array( self::getCleanSmartDebitAmount(self::getArrayFieldValue($smartDebitRecord, 'regular_amount', 'NULL')), 'String' ),
         13 => array( self::getArrayFieldValue($smartDebitRecord, 'frequency_type', 'NULL'), 'String' ),
         14 => array( self::getArrayFieldValue($smartDebitRecord, 'frequency_factor', 'NULL'), 'Int' ),
         15 => array( self::getArrayFieldValue($smartDebitRecord, 'start_date', 'NULL'), 'String' ),
