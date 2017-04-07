@@ -224,7 +224,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
           $listArray[$dao->smart_debit_id]['amount']                = $dao->amount;
           $listArray[$dao->smart_debit_id]['sd_amount']             = $dao->regular_amount;
           $listArray[$dao->smart_debit_id]['contribution_status_id']    = $dao->contribution_status_id;
-          $listArray[$dao->smart_debit_id]['sd_contribution_status_id'] = $dao->current_state;
+          $listArray[$dao->smart_debit_id]['sd_contribution_status_id'] = self::formatSDStatus($dao->current_state);
           $listArray[$dao->smart_debit_id]['transaction_id']        = $dao->trxn_id;
           $listArray[$dao->smart_debit_id]['differences']           = $differences;
           $fixmeurl = CRM_Utils_System::url('civicrm/smartdebit/reconciliation/fixmissingcivi', "cid=".$dao->contact_id."&reference_number=".$dao->reference_number,  TRUE, NULL, FALSE, TRUE, TRUE);
@@ -238,6 +238,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
       $sql .= " , cont.display_name ";
       $sql .= " , csd1.regular_amount ";
       $sql .= " , csd1.frequency_type ";
+      $sql .= " , csd1.frequency_factor ";
       $sql .= " , csd1.current_state ";
       $sql .= " , csd1.payerReference ";
       $sql .= " , csd1.start_date ";
@@ -267,7 +268,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
       $params = array( 1 => array( 10, 'Int' ), 2 => array(1, 'Int') );
       $dao = CRM_Core_DAO::executeQuery( $sql, $params);
       while ($dao->fetch()) {
-        $differences = 'Transaction: ' .$dao->reference_number. ' not Found in Civi';
+        $differences = 'Transaction ID not Found in CiviCRM';
         $transactionRecordFound = false;
 
         // Add records with no valid contact ID
@@ -292,9 +293,10 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
         $listArray[$dao->smart_debit_id]['differences'] = $differences;
         $listArray[$dao->smart_debit_id]['sd_contact_id'] = $dao->payerReference;
         $listArray[$dao->smart_debit_id]['sd_start_date'] = $dao->start_date;
-        $listArray[$dao->smart_debit_id]['sd_frequency'] = $dao->frequency_type;
+        $listArray[$dao->smart_debit_id]['sd_frequency_type'] = $dao->frequency_type;
+        $listArray[$dao->smart_debit_id]['sd_frequency_factor'] = $dao->frequency_factor;
         $listArray[$dao->smart_debit_id]['sd_amount'] = $dao->regular_amount;
-        $listArray[$dao->smart_debit_id]['sd_contribution_status_id'] = $dao->current_state;
+        $listArray[$dao->smart_debit_id]['sd_contribution_status_id'] = self::formatSDStatus($dao->current_state);
         $listArray[$dao->smart_debit_id]['transaction_id'] = $dao->reference_number;
         $listArray[$dao->smart_debit_id]['sd_frequency'] = $dao->frequency_type;
 
@@ -346,17 +348,10 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
     } else {
       $title = 'Found '.count($listArray).' Difference(s)';
     }
-    CRM_Utils_System::setTitle($title);
 
-// Shrink the array if its > 100
-    $newListArray = array();
-    $newListCounter = 0;
-    foreach ($listArray as $key => $listArrayRec) {
-      $newListArray[$key] = $listArrayRec;
-      $newListCounter++;
-    }
-
-    $this->assign( 'listArray', $newListArray );
+    $this->assign('totalRows', $totalRows);
+    $this->assign('listArray', $listArray);
+    CRM_Utils_System::setTitle('Smart Debit Reconciliation');
   }
 
   static function getCleanSmartDebitAmount($amount) {
@@ -738,6 +733,27 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
     }
     else {
       return $array[$field];
+    }
+  }
+
+  /**
+   * Format SmartDebit Status ID for display
+   * @param $sdStatus
+   * @return string
+   */
+  static function formatSDStatus($sdStatus)
+  {
+    switch ($sdStatus) {
+      case 0: // Draft
+        return 'Draft';
+      case 1: // New
+        return 'New';
+      case 10: // Live
+        return 'Live';
+      case 11: // Cancelled
+        return 'Cancelled';
+      case 12: // Rejected
+        return 'Rejected';
     }
   }
 }
