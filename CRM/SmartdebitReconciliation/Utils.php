@@ -21,7 +21,7 @@ class CRM_SmartdebitReconciliation_Utils {
     }
   }
 
-  function get_membership( $contactID, $membershipID = NULL ){
+  static function get_membership( $contactID, $membershipID = NULL ){
     $membershipDetails = CRM_Member_BAO_Membership::getAllContactMembership($contactID);
 
     $membershipOptions = null;
