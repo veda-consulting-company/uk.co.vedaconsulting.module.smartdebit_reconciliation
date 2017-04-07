@@ -21,7 +21,7 @@ class CRM_SmartdebitReconciliation_Utils {
     }
   }
 
-  function get_membership( $contactID ){
+  function get_membership( $contactID, $membershipID = NULL ){
     $membershipDetails = CRM_Member_BAO_Membership::getAllContactMembership($contactID);
 
     $membershipOptions = null;
@@ -55,7 +55,12 @@ class CRM_SmartdebitReconciliation_Utils {
       $membershipOptions[$key] = $type.'/'.$status.'/'.$start_date.'/'.$end_date;
     }
     $membershipOptions['donation'] = 'Donation';
-    return $membershipOptions;
+    if ($membershipID && isset($membershipOptions[$membershipID])) {
+      return $membershipOptions[$membershipID];
+    }
+    else {
+      return $membershipOptions;
+    }
   }
 
   function _get_ContributionId_By_ContributionRecurId( $cRecurID ){

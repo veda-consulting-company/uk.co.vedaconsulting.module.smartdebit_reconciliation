@@ -144,7 +144,7 @@ Class CRM_SmartdebitReconciliation_Page_MembershipRecurDetails extends CRM_Core_
     }
     // If 'Donation' option is chosen for membership, don't process
     if(!empty($mid) && $mid != 'donation'){
-      $membership = self::_get_membership($mid);
+      $membership = self::_get_membership($cid, $mid);
       $this->assign('aMembership', $membership);
     }
     // If 'Create New Recurring' option is chosen for recurring, don't process
