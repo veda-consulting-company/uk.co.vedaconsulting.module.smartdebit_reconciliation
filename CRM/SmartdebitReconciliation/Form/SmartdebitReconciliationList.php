@@ -679,29 +679,38 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
             ) 
             VALUES (%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11,%12,%13,%14,%15,%16,%17, %18)";
       $params = array(
-        1 => array( $smartDebitRecord['title'] ? $smartDebitRecord['title'] : 'NULL'  , 'String' ),
-        2 => array( $smartDebitRecord['first_name'] ? $smartDebitRecord['first_name'] : 'NULL' , 'String' ),
-        3 => array( $smartDebitRecord['last_name'] ? $smartDebitRecord['last_name'] : 'NULL' , 'String' ),
-        4 => array( $smartDebitRecord['email_address'] ?  $smartDebitRecord['email_address'] : 'NULL',  'String'),
-        5 => array( $smartDebitRecord['address_1'] ? $smartDebitRecord['address_1'] : 'NULL', 'String' ),
-        6 => array( $smartDebitRecord['address_2'] ? $smartDebitRecord['address_2'] : 'NULL', 'String' ),
-        7 => array( $smartDebitRecord['address_3']  ?$smartDebitRecord['address_3'] : 'NULL', 'String' ),
-        8 => array( $smartDebitRecord['town'] ? $smartDebitRecord['town'] : 'NULL', 'String' ),
-        9 => array( $smartDebitRecord['county'] ? $smartDebitRecord['county'] : 'NULL', 'String' ),
-        10 => array( $smartDebitRecord['postcode'] ? $smartDebitRecord['postcode'] : 'NULL', 'String' ),
-        11 => array( $smartDebitRecord['first_amount'] ? $smartDebitRecord['first_amount'] : 'NULL', 'String' ),
-        12 => array( $smartDebitRecord['regular_amount'] ? $smartDebitRecord['regular_amount'] : 'NULL', 'String' ),
-        13 => array( $smartDebitRecord['frequency_type'] ? $smartDebitRecord['frequency_type'] : 'NULL', 'String' ),
-        14 => array( $smartDebitRecord['frequency_factor'] ? $smartDebitRecord['frequency_factor'] : NULL, 'Int' ),
-        15 => array( $smartDebitRecord['start_date'] ? $smartDebitRecord['start_date'] : 'NULL', 'String' ),
-        16 => array( $smartDebitRecord['current_state'] ? $smartDebitRecord['current_state'] : 0, 'Int' ),
-        17 => array( $smartDebitRecord['reference_number'] ? $smartDebitRecord['reference_number'] : 'NULL', 'String' ),
-        18 => array( $smartDebitRecord['payerReference'] ? $smartDebitRecord['payerReference'] : 'NULL', 'String' ),
+        1 => array( self::getArrayFieldValue($smartDebitRecord, 'title', 'NULL'), 'String' ),
+        2 => array( self::getArrayFieldValue($smartDebitRecord, 'first_name', 'NULL'), 'String' ),
+        3 => array( self::getArrayFieldValue($smartDebitRecord, 'last_name', 'NULL'), 'String' ),
+        4 => array( self::getArrayFieldValue($smartDebitRecord, 'email_address', 'NULL'),  'String'),
+        5 => array( self::getArrayFieldValue($smartDebitRecord, 'address_1', 'NULL'), 'String' ),
+        6 => array( self::getArrayFieldValue($smartDebitRecord, 'address_2', 'NULL'), 'String' ),
+        7 => array( self::getArrayFieldValue($smartDebitRecord, 'address_3', 'NULL'), 'String' ),
+        8 => array( self::getArrayFieldValue($smartDebitRecord, 'town', 'NULL'), 'String' ),
+        9 => array( self::getArrayFieldValue($smartDebitRecord, 'county', 'NULL'), 'String' ),
+        10 => array( self::getArrayFieldValue($smartDebitRecord, 'postcode', 'NULL'), 'String' ),
+        11 => array( self::getArrayFieldValue($smartDebitRecord, 'first_amount', 'NULL'), 'String' ),
+        12 => array( self::getArrayFieldValue($smartDebitRecord, 'regular_amount', 'NULL'), 'String' ),
+        13 => array( self::getArrayFieldValue($smartDebitRecord, 'frequency_type', 'NULL'), 'String' ),
+        14 => array( self::getArrayFieldValue($smartDebitRecord, 'frequency_factor', 'NULL'), 'Int' ),
+        15 => array( self::getArrayFieldValue($smartDebitRecord, 'start_date', 'NULL'), 'String' ),
+        16 => array( self::getArrayFieldValue($smartDebitRecord, 'current_state', 'NULL'), 'Int' ),
+        17 => array( self::getArrayFieldValue($smartDebitRecord, 'reference_number', 'NULL'), 'String' ),
+        18 => array( self::getArrayFieldValue($smartDebitRecord, 'payerReference', 'NULL'), 'String' ),
       );
       CRM_Core_DAO::executeQuery($sql, $params);
     }
     CRM_Core_Error::debug_var('CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList Insert Into civicrm_sd_refresh table', 'Ended');
     $mandateFetchedCount = count($smartDebitArray);
     return $mandateFetchedCount;
+  }
+
+  static function getArrayFieldValue($array, $field, $value) {
+    if (!isset($array[$field])) {
+      return $value;
+    }
+    else {
+      return $array[$field];
+    }
   }
 }
