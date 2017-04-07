@@ -77,8 +77,7 @@ Class CRM_SmartdebitReconciliation_Page_MembershipRecurDetails extends CRM_Core_
     }
   }
 
-  static function _get_optionGroup( $groupName ){
-
+  static function _get_optionGroup( $groupName ) {
     $optionGroup = array(
       'version'     => 3,
       'sequential'  => 1,
@@ -87,12 +86,12 @@ Class CRM_SmartdebitReconciliation_Page_MembershipRecurDetails extends CRM_Core_
     $aOptionGroup = civicrm_api('OptionGroup', 'get', $optionGroup);
     if(!$aOptionGroup['is_error']){
       return $aOptionGroup['values'][0];
-    }else{
+    } else {
       return $aOptionGroup['error_message'];
     }
   }
 
-  static function _get_contribution_recur( $cRecurID ){
+  static function _get_contribution_recur($cRecurID) {
     $cRecurParams = array(
       'version'     => 3,
       'sequential'  => 1,
@@ -156,4 +155,3 @@ Class CRM_SmartdebitReconciliation_Page_MembershipRecurDetails extends CRM_Core_
     parent::run();
   }
 }
-?>
