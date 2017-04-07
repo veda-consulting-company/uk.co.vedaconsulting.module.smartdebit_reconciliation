@@ -37,30 +37,6 @@ Class CRM_SmartdebitReconciliation_Page_MembershipRecurDetails extends CRM_Core_
     }
   }
 
-  static function _get_membership( $id ){
-    $mParams = array(
-      'version'     => 3,
-      'sequential'  => 1,
-      'id'          => $id
-    );
-    $aMembership = civicrm_api('Membership', 'get', $mParams);
-    $mem         = $aMembership['values'][0];
-    $memType     = CRM_SmartdebitReconciliation_Utils::_get_membership_type($mem['membership_type_id']);
-    $memStatus   = CRM_SmartdebitReconciliation_Utils::_get_membership_status($mem['status_id']);
-    $start_date  = array_key_exists('start_date', $mem) ? $mem['start_date'] : 'Null';
-    $end_date    = array_key_exists('end_date', $mem) ? $mem['end_date'] : 'Null';
-    if(!empty($mem)){
-      $membership  = array(
-        'id'        => $mem['id'],
-        'status'    => $memStatus,
-        'type'      => $memType,
-        'start_date'=> $start_date,
-        'end_date'  => $end_date,
-      );
-    }
-    return $membership;
-  }
-
   static function _get_optionValue($opGroupID, $value){
 
     $optionValue = array(
@@ -144,7 +120,7 @@ Class CRM_SmartdebitReconciliation_Page_MembershipRecurDetails extends CRM_Core_
     }
     // If 'Donation' option is chosen for membership, don't process
     if(!empty($mid) && $mid != 'donation'){
-      $membership = self::_get_membership($cid, $mid);
+      $membership = CRM_SmartdebitReconciliation_Utils::_get_membership($cid, $mid);
       $this->assign('aMembership', $membership);
     }
     // If 'Create New Recurring' option is chosen for recurring, don't process
