@@ -68,12 +68,11 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
    * @access public
    * @return void
    */
-  function buildQuickForm( ) {
+  function buildQuickForm() {
     // For smart debit sync purpose
     $sync = CRM_Utils_Array::value('sync', $_GET, '');
     $this->assign('sync', $sync);
 
-    $transactionIdList = "'dummyId'";  //Initialised so have at least one entry in list
     $listArray = array();
 
     // The following differences are highlighted
@@ -168,7 +167,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
           12 Rejected
          *
          */
-        // First case check if Smart Debit is new or livet then CiviCRM is in progress
+        // First case check if Smart Debit is new or live then CiviCRM is in progress
         if (CRM_Utils_Array::value('checkStatus', $_GET)) {
           if (($dao->current_state == 10 || $dao->current_state == 1) && ($dao->contribution_status_id != 5)) {
             $different = true;
