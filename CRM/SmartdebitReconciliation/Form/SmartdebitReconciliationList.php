@@ -361,8 +361,9 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
     $this->assign( 'listArray', $newListArray );
   }
 
-  static function getCleanSmartDebitAmount($smartDebitAmount) {
-    return(substr($smartDebitAmount, 2));
+  static function getCleanSmartDebitAmount($amount) {
+    $numeric_filtered = filter_var($amount, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+    return($numeric_filtered);
   }
 
   /* This function is used when there is a pending recur record and a incomplete transaction
