@@ -56,7 +56,7 @@
     <table  class="selector row-highlight">
         <tr style="background-color: #CDE8FE;">
             <td><b>{ts}Transaction ID{/ts}</td>
-            <td><b>{ts}Contact{/ts}</td>
+            <td><b>{ts}Contact (SD Contact ID){/ts}</td>
             <td><b>{ts}Differences{/ts}</td>
             <td><b>{ts}Frequency{/ts}</td>
             <td><b>{ts}Total{/ts}</td>
@@ -81,7 +81,7 @@
                     {if $row.contact_id gt 0}
                         <a href="{$contactViewURL}">{$row.contact_name}</a>
                     {else}
-                        {$row.contact_name}
+                        {$row.contact_name} ({$row.sd_contact_id})
                     {/if}
                 </td>
                 <td>{$row.differences}</td>

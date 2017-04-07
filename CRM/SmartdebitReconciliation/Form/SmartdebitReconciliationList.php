@@ -271,15 +271,16 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
         $differences = 'Transaction ID not Found in CiviCRM';
         $transactionRecordFound = false;
 
+        CRM_Core_Error::debug_log_message('contact_id: '.$dao->contact_id);
         // Add records with no valid contact ID
-        if (!empty($dao->contact_id) && $hasContact) {
+        if (!empty($dao->contact_id)) {
           // Set values for records with a valid contact ID
           $differences .= ' But Contact Found Using Smart Debit payerReference ' . $dao->payerReference;
           $missingContactID = $dao->contact_id;
           $missingContactName = $dao->display_name;
           $fixmeUrl = CRM_Utils_System::url('civicrm/smartdebit/reconciliation/fixmissingcivi', "cid=" . $dao->contact_id . "&reference_number=" . $dao->reference_number, TRUE, NULL, FALSE, TRUE, TRUE);
         }
-        elseif (empty($dao->contact_id) && !$hasContact) {
+        elseif (empty($dao->contact_id)) {
           // Set values for records with no valid contact ID in CiviCRM
           $missingContactID = 0;
           $missingContactName = $dao->first_name.' '.$dao->last_name;
