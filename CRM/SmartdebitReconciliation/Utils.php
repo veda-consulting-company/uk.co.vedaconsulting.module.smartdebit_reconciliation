@@ -47,6 +47,11 @@ class CRM_SmartdebitReconciliation_Utils {
                                'type'       => $type,
                                'status'     => $status
                              ); */
+      $membershipOptions[$key]['id'] = $key;
+      $membershipOptions[$key]['start_date'] = $start_date;
+      $membershipOptions[$key]['end_date'] = $end_date;
+      $membershipOptions[$key]['type'] = $type;
+      $membershipOptions[$key]['status'] = $status;
       $membershipOptions[$key] = $type.'/'.$status.'/'.$start_date.'/'.$end_date;
     }
     $membershipOptions['donation'] = 'Donation';
