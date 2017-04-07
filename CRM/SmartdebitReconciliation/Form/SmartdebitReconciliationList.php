@@ -73,6 +73,15 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
     $sync = CRM_Utils_Array::value('sync', $_GET, '');
     $this->assign('sync', $sync);
 
+    $checkAmount = CRM_Utils_Array::value('checkAmount', $_GET);
+    $checkFrequency = CRM_Utils_Array::value('checkFrequency', $_GET);
+    $checkStatus = CRM_Utils_Array::value('checkStatus', $_GET);
+    $checkPayerReference = CRM_Utils_Array::value('checkPayerReference', $_GET);
+    $checkMissingFromCivi = CRM_Utils_Array::value('checkMissingFromCivi', $_GET);
+    $checkMissingFromSD = CRM_Utils_Array::value('checkMissingFromSD', $_GET);
+    // Only display smart debit records that have a matching contact in CiviCRM if hasContact=1
+    $hasContact = CRM_Utils_Array::value('hasContact', $_GET);
+
     $listArray = array();
 
     // The following differences are highlighted
@@ -85,11 +94,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
     //foreach ($smartDebitArray as $key => $smartDebitRecord) {
 
     // Start Here
-    if (CRM_Utils_Array::value('checkAmount', $_GET) ||
-      CRM_Utils_Array::value('checkFrequency', $_GET) ||
-      CRM_Utils_Array::value('checkStatus', $_GET) ||
-      CRM_Utils_Array::value('checkPayerReference', $_GET) ) {
-
+    if ($checkAmount || $checkFrequency || $checkStatus || $checkPayerReference) {
       $sql  = " SELECT ctrc.id contribution_recur_id ";
       $sql .= " , ctrc.contact_id ";
       $sql .= " , cont.display_name ";
@@ -133,7 +138,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
         $separatorCharacter = ' | ';
 
 
-        if (CRM_Utils_Array::value('checkAmount', $_GET)) {
+        if ($checkAmount) {
           if ($regularAmount != $dao->amount) {
             $different = true;
             $differences .= 'Amount';
@@ -141,7 +146,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
           }
         }
 
-        if (CRM_Utils_Array::value('checkFrequency', $_GET)) {
+        if ($checkFrequency) {
           if ($dao->frequency_type == 'M' && $dao->frequency_unit != 'month' ) {
             $different = true;
             $differences .= 'Frequency';
@@ -168,7 +173,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
          *
          */
         // First case check if Smart Debit is new or live then CiviCRM is in progress
-        if (CRM_Utils_Array::value('checkStatus', $_GET)) {
+        if ($checkStatus) {
           if (($dao->current_state == 10 || $dao->current_state == 1) && ($dao->contribution_status_id != 5)) {
             $different = true;
             $differences .= $separator. 'Status';
@@ -183,7 +188,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
         }
 
         // 2. Transaction Id in Smart Debit and Civi for different contacts
-        if (CRM_Utils_Array::value('checkPayerReference', $_GET)) {
+        if ($checkPayerReference) {
           if ($dao->payerReference != $dao->contact_id) {
             $different = true;
             $differences .= $separator. 'Payer Reference';
@@ -220,7 +225,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
         }
       }
     }
-    if (CRM_Utils_Array::value('checkMissingFromCivi', $_GET)) {
+    if ($checkMissingFromCivi) {
       // 3. Transaction Id in Smart Debit but none found in Civi
       $sql  = " SELECT SQL_CALC_FOUND_ROWS cont.id as contact_id ";
       $sql .= " , cont.display_name ";
@@ -237,50 +242,56 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
       $sql .= " LEFT JOIN civicrm_contribution_recur ctrc ON ctrc.trxn_id = csd1.reference_number";
       $sql .= " LEFT JOIN civicrm_contact cont ON cont.id = csd1.payerReference";
       $sql .= " WHERE ( csd1.current_state = %1 OR csd1.current_state = %2 ) ";
-      $sql .= " AND ctrc.id IS NULL LIMIT 100";
+      $sql .= " AND ctrc.id IS NULL";
       $params = array( 1 => array( 10, 'Int' ), 2 => array(1, 'Int') );
       $dao = CRM_Core_DAO::executeQuery( $sql, $params);
       while ($dao->fetch()) {
         $differences = 'Transaction: ' .$dao->reference_number. ' not Found in Civi';
         $regularAmount = substr($dao->regular_amount, 2);
         $transactionRecordFound = false;
-        if (!empty($dao->contact_id)) {
-          $differences.= ' But Contact Found Using Smart Debit payerReference '. $dao->payerReference;
+        $addRecord = false;
+        // Add records with no valid contact ID
+        if (!empty($dao->contact_id) && $hasContact) {
+          // Add records with a valid contact ID
+          $differences .= ' But Contact Found Using Smart Debit payerReference ' . $dao->payerReference;
           $missingContactID = $dao->contact_id;
           $missingContactName = $dao->display_name;
-          $fixmemissing = CRM_Utils_System::url('civicrm/smartdebit/reconciliation/fixmissingcivi', "cid=".$dao->contact_id."&reference_number=".$dao->reference_number,  TRUE, NULL, FALSE, TRUE, TRUE);
-          $listArray[$dao->smart_debit_id]['fix_me_url']								= $fixmemissing;
-        } else {
+          $fixmeUrl = CRM_Utils_System::url('civicrm/smartdebit/reconciliation/fixmissingcivi', "cid=" . $dao->contact_id . "&reference_number=" . $dao->reference_number, TRUE, NULL, FALSE, TRUE, TRUE);
+          $addRecord = true;
+        }
+        elseif (empty($dao->contact_id) && !$hasContact) {
+          // Add records with no valid contact ID in CiviCRM
           $missingContactID = 0;
           $missingContactName = $dao->first_name.' '.$dao->last_name;
-          $fixmeelsemissing = CRM_Utils_System::url('civicrm/smartdebit/reconciliation/fixmissingcivi', "reference_number=".$dao->reference_number,  TRUE, NULL, FALSE, TRUE, TRUE);
-          $listArray[$dao->smart_debit_id]['fix_me_url']								= $fixmeelsemissing;
+          $fixmeUrl = CRM_Utils_System::url('civicrm/smartdebit/reconciliation/fixmissingcivi', "reference_number=".$dao->reference_number,  TRUE, NULL, FALSE, TRUE, TRUE);
+          $addRecord = true;
         }
-        $listArray[$dao->smart_debit_id]['recordFound']								= $transactionRecordFound;
-        $listArray[$dao->smart_debit_id]['contact_id']								= $missingContactID;
-        $listArray[$dao->smart_debit_id]['contact_name']							= $missingContactName;
-        $listArray[$dao->smart_debit_id]['differences']								= $differences;
-        $listArray[$dao->smart_debit_id]['sd_contact_id']							= $dao->payerReference;
-        $listArray[$dao->smart_debit_id]['sd_start_date']							= $dao->start_date;
-        $listArray[$dao->smart_debit_id]['sd_frequency']							= $dao->frequency_type;
-        $listArray[$dao->smart_debit_id]['sd_amount']									= $regularAmount;
-        $listArray[$dao->smart_debit_id]['sd_contribution_status_id'] = $dao->current_state;
-        $listArray[$dao->smart_debit_id]['transaction_id']            = $dao->reference_number;
-        $listArray[$dao->smart_debit_id]['sd_frequency']              = $dao->frequency_type;
+        if ($addRecord) {
+          $listArray[$dao->smart_debit_id]['fix_me_url']                = $fixmeUrl;
+          $listArray[$dao->smart_debit_id]['recordFound']								= $transactionRecordFound;
+          $listArray[$dao->smart_debit_id]['contact_id']								= $missingContactID;
+          $listArray[$dao->smart_debit_id]['contact_name']							= $missingContactName;
+          $listArray[$dao->smart_debit_id]['differences']								= $differences;
+          $listArray[$dao->smart_debit_id]['sd_contact_id']							= $dao->payerReference;
+          $listArray[$dao->smart_debit_id]['sd_start_date']							= $dao->start_date;
+          $listArray[$dao->smart_debit_id]['sd_frequency']							= $dao->frequency_type;
+          $listArray[$dao->smart_debit_id]['sd_amount']									= $regularAmount;
+          $listArray[$dao->smart_debit_id]['sd_contribution_status_id'] = $dao->current_state;
+          $listArray[$dao->smart_debit_id]['transaction_id']            = $dao->reference_number;
+          $listArray[$dao->smart_debit_id]['sd_frequency']              = $dao->frequency_type;
+        }
 
         // We've found a contact id matching that in smart debit
         // Need to determine if its a correupt renewal or something
         // i.e. there is a pending payment for the recurring record and the recurring record itself
       }
       $query = "SELECT FOUND_ROWS()";
-      $totalRows = CRM_Core_DAO::singleValueQuery( $query );
+      $totalRows = CRM_Core_DAO::singleValueQuery($query);
     }
 
-    if (CRM_Utils_Array::value('checkMissingFromSD', $_GET)) {
-
+    if ($checkMissingFromSD) {
       // 4. Transaction Id in Civi but none in Smart Debit
       $arrayIndex = 1;
-
       $sql  = " SELECT SQL_CALC_FOUND_ROWS ctrc.id contribution_recur_id ";
       $sql .= " , ctrc.contact_id ";
       $sql .= " , cont.display_name ";
@@ -299,7 +310,6 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
       $sql .= " WHERE opgr.name = 'payment_instrument' ";
       $sql .= " AND   opva.label = 'Direct Debit' ";
       $sql .= " AND   csd.id IS NULL LIMIT 100 ";
-
       $dao = CRM_Core_DAO::executeQuery( $sql );
 
       while ($dao->fetch()) {
@@ -312,16 +322,16 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
         $arrayIndex = $arrayIndex + 1;
       }
       $query = "SELECT FOUND_ROWS()";
-      $totalRows = CRM_Core_DAO::singleValueQuery( $query );
+      $totalRows = CRM_Core_DAO::singleValueQuery($query);
     }
-    if (CRM_Utils_Array::value('checkMissingFromCivi', $_GET) || CRM_Utils_Array::value('checkMissingFromSD', $_GET)) {
+    if ($checkMissingFromCivi || $checkMissingFromSD) {
       $title = 'Showing '.count($listArray).' of '.$totalRows.' Difference(s)';
     } else {
       $title = 'Found '.count($listArray).' Difference(s)';
     }
-    CRM_Utils_System::setTitle( $title );
+    CRM_Utils_System::setTitle($title);
 
-    // Shrink the array if its > 100
+// Shrink the array if its > 100
     $newListArray = array();
     $newListCounter = 0;
     foreach ($listArray as $key => $listArrayRec) {

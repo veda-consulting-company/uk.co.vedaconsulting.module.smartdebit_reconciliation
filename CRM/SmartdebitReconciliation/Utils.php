@@ -1,19 +1,19 @@
 <?php
 
-class CRM_SmartdebitReconciliation_Utils{
+class CRM_SmartdebitReconciliation_Utils {
   static function _get_membership_type( $membershipTypeID ){
     if( empty($membershipTypeID)){
       return "Not Found";
     }
     $mTypeParams = array(
-                'version'     => 3,
-                'sequential'  => 1,
-                'id'          => $membershipTypeID
+      'version'     => 3,
+      'sequential'  => 1,
+      'id'          => $membershipTypeID
     );
     $aMembershipType = civicrm_api('MembershipType', 'get', $mTypeParams);
     if ( !$aMembershipType['is_error']){
       return $aMembershipType['values'][0]['name'];
-    }else{
+    } else {
       $sql = "SELECT name 
               FROM civicrm_membership_type
               WHERE id = %1
@@ -23,14 +23,15 @@ class CRM_SmartdebitReconciliation_Utils{
       return $dao;
     }
   }
+
   static function _get_membership_status( $membershipStatusID ){
     if( empty($membershipStatusID)){
       return "Not Found";
     }
     $mStatusParams = array(
-                'version'     => 3,
-                'sequential'  => 1,
-                'id'          => $membershipStatusID
+      'version'     => 3,
+      'sequential'  => 1,
+      'id'          => $membershipStatusID
     );
     $aMembershipStatus = civicrm_api('MembershipStatus', 'get', $mStatusParams);
     if(!$aMembershipStatus['is_error']){
@@ -45,14 +46,14 @@ class CRM_SmartdebitReconciliation_Utils{
       return $dao;
     }
   }
-  
+
   function get_membership( $contactID ){
     $aMembershipOption = null;
     $mParams = array(
-                'version'     => 3,
-                'sequential'  => 1,
-                'contact_id' => $contactID
-              );
+      'version'     => 3,
+      'sequential'  => 1,
+      'contact_id' => $contactID
+    );
     $aMembership = civicrm_api('Membership', 'get', $mParams);
     foreach ($aMembership['values'] as $membership ) {
       $mem_id     = $membership['id'];
@@ -77,29 +78,29 @@ class CRM_SmartdebitReconciliation_Utils{
                                'status'     => $status
                              ); */
       $aMembershipOption[$mem_id] = $type.'/'.$status.'/'.$start_date.'/'.$end_date;
-     }
-     $aMembershipOption['donation'] = 'Donation';
-   return $aMembershipOption;
+    }
+    $aMembershipOption['donation'] = 'Donation';
+    return $aMembershipOption;
   }
-  
- 
+
   function _get_ContributionId_By_ContributionRecurId( $cRecurID ){
     $contributionParams = array(
-                'version'               => 3,
-                'sequential'            => 1,
-                'contribution_recur_id' => $cRecurID
+      'version'               => 3,
+      'sequential'            => 1,
+      'contribution_recur_id' => $cRecurID
     );
     $aContributionRecur = civicrm_api('Contribution', 'get', $contributionParams);
     return $aContributionRecur['values'][0];
   }
+
   function get_Recurring_Record( $contactID ){
     $cRecur = null;
-    $aContributionRecur = CRM_Contribute_BAO_ContributionRecur::getRecurContributions($contactID); 
+    $aContributionRecur = CRM_Contribute_BAO_ContributionRecur::getRecurContributions($contactID);
     foreach ( $aContributionRecur as $ContributionRecur){
       $sql = " SELECT name FROM civicrm_payment_processor WHERE id = %1 ";
-      $param = array( 1 => array($ContributionRecur['payment_processor_id'], 'Integer') ); 
+      $param = array( 1 => array($ContributionRecur['payment_processor_id'], 'Integer') );
       $dao = CRM_Core_DAO::singleValueQuery($sql, $param);
-      
+
       /*$acontribution = self::_get_ContributionId_By_ContributionRecurId( $ContributionRecur['id'] );
       $cRecur[] = array(
           'contribution_id'       => $acontribution['id'],
@@ -108,7 +109,7 @@ class CRM_SmartdebitReconciliation_Utils{
           'amount'                => $ContributionRecur['amount'],
           'payment_processor'     => $dao,
       );*/
-      
+
       $cRecur[$ContributionRecur['id']] = $dao.'/'.$ContributionRecur['contribution_status'].'/'.$ContributionRecur['amount'];
     }
     $cRecur['new_recur'] = 'Create New Recurring';
