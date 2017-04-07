@@ -33,9 +33,9 @@
                 <div style="crm-form">
                     <h4>Show All Mandates Missing from CiviCRM:</h4>
                     <ul>
-                        <li><a href="{crmURL p='civicrm/smartdebit/reconciliation/list' q='checkMissingFromCivi=1&hasContact=1&hasAmount=1' h=0}">With Contact in CiviCRM and Amount</a></li>
+                        <li><a href="{crmURL p='civicrm/smartdebit/reconciliation/list' q='checkMissingFromCivi=1&hasContact=1&hasAmount=1' h=0}">With Contact in CiviCRM and has Amount</a></li>
                         <li><a href="{crmURL p='civicrm/smartdebit/reconciliation/list' q='checkMissingFromCivi=1&hasContact=1&hasAmount=0' h=0}">With Contact in CiviCRM and no Amount</a></li>
-                        <li><a href="{crmURL p='civicrm/smartdebit/reconciliation/list' q='checkMissingFromCivi=1&hasContact=0&hasAmount=1' h=0}">With No Contact in CiviCRM and Amount</a></li>
+                        <li><a href="{crmURL p='civicrm/smartdebit/reconciliation/list' q='checkMissingFromCivi=1&hasContact=0&hasAmount=1' h=0}">With No Contact in CiviCRM and has Amount</a></li>
                         <li><a href="{crmURL p='civicrm/smartdebit/reconciliation/list' q='checkMissingFromCivi=1&hasContact=0&hasAmount=0' h=0}">With No Contact in CiviCRM and no Amount</a></li>
                     </ul>
                     <h4>Other Filters:</h4>

@@ -253,10 +253,10 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
       $sql .= " AND ctrc.id IS NULL";
       // Filter records that have an amount recorded against them or not
       if ($hasAmount) {
-        $sql .= " AND (csd1.regular_amount IS NOT NULL AND csd1.regular_amount != ' ')";
+        $sql .= " AND (COALESCE(csd1.regular_amount, '') != '')";
       }
       else {
-        $sql .= " AND (csd1.regular_amount IS NULL OR csd1.regular_amount = ' ')";
+        $sql .= " AND (COALESCE(csd1.regular_amount, '') = '')";
       }
       // Filter records with no valid contact ID
       if ($hasContact) {
