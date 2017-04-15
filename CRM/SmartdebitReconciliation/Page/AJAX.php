@@ -2,17 +2,21 @@
 
 class CRM_SmartdebitReconciliation_Page_AJAX
 {
-  static function getMembershipByContactID() {
 
+  /**
+   * Get list of memberships and recurring contributions
+   * Pass in "selectedContact" contact ID as POST parameter.
+   */
+  static function getMembershipByContactID() {
     $selectedContact = CRM_Utils_Array::value('selectedContact', $_POST);
     if (empty($selectedContact)) {
       return;
     }
-    $membership = CRM_SmartdebitReconciliation_Utils::getContactMemberships($selectedContact);
+    $membershipList = CRM_SmartdebitReconciliation_Utils::getContactMemberships($selectedContact);
     $cRecur     = CRM_SmartdebitReconciliation_Utils::getContactRecurringContributions($selectedContact);
     $nullMembership = array( 0 => 'No Membership Found');
     $nullcRecur = array( 0 => 'No Contribution Recur Found');
-    $options['membership'] = $membership ? $membership : $nullMembership;
+    $options['membership'] = $membershipList ? $membershipList : $nullMembership;
     $options['cRecur']     = $cRecur ? $cRecur : $nullcRecur;
     echo json_encode($options);
     exit;

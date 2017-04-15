@@ -3,7 +3,7 @@
   <table class="crm-info-panel">
     <tr>
       <td width="30%">
-        Smart Debit Reference :
+        <strong>Smart Debit Reference:</strong>
       </td>
       <td>
         {$reference_number}
@@ -12,10 +12,9 @@
     <tr>
       {if !empty($aContact) }
         <td>
-          Name :
+          <strong>Name:</strong>
         </td>
         <td>
-
           {$aContact.display_name}
         </td>
       {/if}
@@ -23,7 +22,7 @@
     <tr>
       {if !empty($aAddress) }
         <td>
-          Address :
+          <strong>Address:</strong>
         </td>
         <td>
           {$aAddress.street_address} <br />
@@ -36,8 +35,9 @@
     {if !empty($aMembership)}
       <tr>
         <td>
-          Membership :
+          <strong>Membership:</strong>
         </td>
+        <td></td>
       </tr>
       <tr>
         <td>
@@ -75,8 +75,9 @@
     {if !empty($aContributionRecur)}
       <tr>
         <td>
-          Contribution Recur :
+          <strong>Contribution Recur:</strong>
         </td>
+        <td></td>
       </tr>
       <tr>
         <td>
@@ -103,8 +104,6 @@
         </td>
       </tr>
     {/if}
-
-
   </table>
 
 </div>

@@ -1,7 +1,6 @@
 <h3>{ts}Contact Membership and Contribution Recur{/ts}</h3>
 <div class="crm-form-block">
   <table class="crm-info-panel">
-
     <tr>
       <td>
         <b>Smart Debit Details
@@ -40,8 +39,6 @@
 
       </td>
     </tr>
-
-
     <tr>
       <td>
         {$form.reference_number.label}
@@ -77,7 +74,6 @@
         <sub>( Payment Processor / Contribution Status / Amount)</sub>
       </td>
     </tr>
-
   </table>
 
   <div class="crm-submit-buttons">
@@ -93,7 +89,7 @@
 {/literal}
 <script type="text/javascript">
   {literal}
-  var memStatusCurrent = {/literal}"{$memStatusCurrent}"{literal}; //MV assigned the memership Status Name 'Current' as constant
+  var memStatusCurrent = {/literal}"{$memStatusCurrent}"{literal}; //MV assigned the membership Status Name 'Current' as constant
   var contactUrl = {/literal}"{crmURL p='civicrm/ajax/rest' q='className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=navigation' h=0 }"{literal};
   var getTemplateContentUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_SmartdebitReconciliation_Page_AJAX&fnName=getMembershipByContactID&json=1'}"{literal}
   var $form = cj("form.{/literal}{$form.formClass}{literal}");
@@ -107,24 +103,6 @@
       getMembershipAndRecur(cid);
 
   });
-  /*
-   cj( '#contact_name' ).autocomplete( contactUrl, {
-   width: 200,
-   selectFirst: false,
-   minChars:1,
-   matchContains: true,
-   delay: 400
-   }).result(function(event, data, formatted) {
-   var cid = data[1];
-   var name = data[0].split('::');
-   cj('input[name=cid]').val(cid);
-   cj('#contact_name').val(name[0]);
-   cj('#membership_record').parents('tr').show();
-   cj('#contribution_recur_record').parents('tr').show();
-   cj('.crm-submit-buttons').show();
-   getMembershipAndRecur(cid);
-   });
-   */
 
   function getMembershipAndRecur(cid) {
       var getTemplateContentUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_SmartdebitReconciliation_Page_AJAX&fnName=getMembershipByContactID&json=1'}"{literal}
@@ -166,7 +144,6 @@
               });
           }
       });
-
   }
   cj(document).ready(function(){
       var cid = {/literal}"{$cid}"{literal};
