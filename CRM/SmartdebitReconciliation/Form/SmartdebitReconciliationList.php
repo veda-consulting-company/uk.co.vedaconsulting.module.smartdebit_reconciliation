@@ -96,34 +96,34 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
 
     // Start Here
     if ($checkAmount || $checkFrequency || $checkStatus || $checkPayerReference) {
-      $sql  = " SELECT ctrc.id contribution_recur_id ";
-      $sql .= " , ctrc.contact_id ";
-      $sql .= " , cont.display_name ";
-      $sql .= " , ctrc.payment_instrument_id ";
-      $sql .= " , opva.label payment_instrument ";
-      $sql .= " , ctrc.start_date ";
-      $sql .= " , ctrc.amount ";
-      $sql .= " , ctrc.trxn_id  ";
-      $sql .= " , ctrc.contribution_status_id ";
-      $sql .= " , ctrc.frequency_unit ";
-      $sql .= " , ctrc.frequency_interval ";
-      $sql .= " , ctrc.financial_type_id ";
-      $sql .= " , csd.regular_amount ";
-      $sql .= " , csd.frequency_type ";
-      $sql .= " , csd.frequency_factor ";
-      $sql .= " , csd.current_state ";
-      $sql .= " , csd.payerReference ";
-      $sql .= " , csd.start_date as smart_debit_start_date ";
-      $sql .= " , csd.reference_number ";
-      $sql .= " , csd.id as smart_debit_id";
-      $sql .= " FROM ";
-      $sql .= " civicrm_contribution_recur ctrc ";
-      $sql .= " LEFT JOIN civicrm_contact cont ON (ctrc.contact_id = cont.id) ";
-      $sql .= " LEFT JOIN civicrm_option_value opva ON (ctrc.payment_instrument_id = opva.value) ";
-      $sql .= " LEFT JOIN civicrm_option_group opgr ON (opgr.id = opva.option_group_id) ";
-      $sql .= " INNER JOIN civicrm_sd_refresh csd ON csd.reference_number = ctrc.trxn_id ";
-      $sql .= " WHERE opgr.name = 'payment_instrument' ";
-      $sql .= " AND   opva.label = 'Direct Debit' ";
+      $sql  = "
+SELECT ctrc.id contribution_recur_id, 
+  ctrc.contact_id,
+  cont.display_name,
+  ctrc.payment_instrument_id,
+  opva.label payment_instrument,
+  ctrc.start_date,
+  ctrc.amount,
+  ctrc.trxn_id,
+  ctrc.contribution_status_id,
+  ctrc.frequency_unit,
+  ctrc.frequency_interval,
+  ctrc.financial_type_id,
+  csd.regular_amount,
+  csd.frequency_type,
+  csd.frequency_factor,
+  csd.current_state,
+  csd.payerReference,
+  csd.start_date as smart_debit_start_date,
+  csd.reference_number,
+  csd.id as smart_debit_id 
+FROM civicrm_contribution_recur ctrc 
+LEFT JOIN civicrm_contact cont ON (ctrc.contact_id = cont.id) 
+LEFT JOIN civicrm_option_value opva ON (ctrc.payment_instrument_id = opva.value) 
+LEFT JOIN civicrm_option_group opgr ON (opgr.id = opva.option_group_id) 
+INNER JOIN civicrm_sd_refresh csd ON csd.reference_number = ctrc.trxn_id 
+WHERE opgr.name = 'payment_instrument' 
+AND   opva.label = 'Direct Debit' ";
 
       $dao = CRM_Core_DAO::executeQuery( $sql);
 
@@ -234,23 +234,24 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
     }
     if ($checkMissingFromCivi) {
       // 3. Transaction Id in Smart Debit but none found in Civi
-      $sql  = " SELECT SQL_CALC_FOUND_ROWS cont.id as contact_id ";
-      $sql .= " , cont.display_name ";
-      $sql .= " , csd1.regular_amount ";
-      $sql .= " , csd1.frequency_type ";
-      $sql .= " , csd1.frequency_factor ";
-      $sql .= " , csd1.current_state ";
-      $sql .= " , csd1.payerReference ";
-      $sql .= " , csd1.start_date ";
-      $sql .= " , csd1.reference_number ";
-      $sql .= " , csd1.id as smart_debit_id";
-      $sql .= " , csd1.first_name";
-      $sql .= " , csd1.last_name";
-      $sql .= " FROM civicrm_sd_refresh csd1";
-      $sql .= " LEFT JOIN civicrm_contribution_recur ctrc ON ctrc.trxn_id = csd1.reference_number";
-      $sql .= " LEFT JOIN civicrm_contact cont ON cont.id = csd1.payerReference";
-      $sql .= " WHERE ( csd1.current_state = %1 OR csd1.current_state = %2 ) ";
-      $sql .= " AND ctrc.id IS NULL";
+      $sql  = "
+SELECT contact.id as contact_id,
+  contact.display_name,
+  csd1.regular_amount,
+  csd1.frequency_type,
+  csd1.frequency_factor,
+  csd1.current_state,
+  csd1.payerReference,
+  csd1.start_date,
+  csd1.reference_number,
+  csd1.id as smart_debit_id,
+  csd1.first_name,
+  csd1.last_name 
+FROM civicrm_sd_refresh csd1 
+LEFT JOIN civicrm_contribution_recur ctrc ON ctrc.trxn_id = csd1.reference_number 
+LEFT JOIN civicrm_contact contact ON contact.id = csd1.payerReference 
+WHERE ( csd1.current_state = %1 OR csd1.current_state = %2 ) 
+AND ctrc.id IS NULL";
       // Filter records that have an amount recorded against them or not
       if ($hasAmount) {
         $sql .= " AND (COALESCE(csd1.regular_amount, '') != '')";
@@ -260,10 +261,10 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
       }
       // Filter records with no valid contact ID
       if ($hasContact) {
-        $sql .= " AND contact_id IS NOT NULL";
+        $sql .= " AND contact.id IS NOT NULL";
       }
       else {
-        $sql .= " AND contact_id IS NULL";
+        $sql .= " AND contact.id IS NULL";
       }
       $params = array( 1 => array( 10, 'Int' ), 2 => array(1, 'Int') );
       $dao = CRM_Core_DAO::executeQuery( $sql, $params);
@@ -312,24 +313,25 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
     if ($checkMissingFromSD) {
       // 4. Transaction Id in Civi but none in Smart Debit
       $arrayIndex = 1;
-      $sql  = " SELECT SQL_CALC_FOUND_ROWS ctrc.id contribution_recur_id ";
-      $sql .= " , ctrc.contact_id ";
-      $sql .= " , cont.display_name ";
-      $sql .= " , ctrc.payment_instrument_id ";
-      $sql .= " , opva.label payment_instrument ";
-      $sql .= " , ctrc.start_date ";
-      $sql .= " , ctrc.amount ";
-      $sql .= " , ctrc.trxn_id  ";
-      $sql .= " , ctrc.contribution_status_id ";
-      $sql .= " FROM ";
-      $sql .= " civicrm_contribution_recur ctrc";
-      $sql .= " LEFT JOIN civicrm_contact cont ON (ctrc.contact_id = cont.id) ";
-      $sql .= " LEFT JOIN civicrm_option_value opva ON (ctrc.payment_instrument_id = opva.value) ";
-      $sql .= " LEFT JOIN civicrm_option_group opgr ON (opgr.id = opva.option_group_id) ";
-      $sql .= " LEFT JOIN civicrm_sd_refresh csd ON csd.reference_number = ctrc.trxn_id ";
-      $sql .= " WHERE opgr.name = 'payment_instrument' ";
-      $sql .= " AND   opva.label = 'Direct Debit' ";
-      $sql .= " AND   csd.id IS NULL LIMIT 100 ";
+      $sql  = "
+SELECT SQL_CALC_FOUND_ROWS ctrc.id contribution_recur_id,
+  ctrc.contact_id,
+  cont.display_name,
+  ctrc.payment_instrument_id,
+  opva.label payment_instrument,
+  ctrc.start_date,
+  ctrc.amount,
+  ctrc.trxn_id,
+  ctrc.contribution_status_id 
+FROM civicrm_contribution_recur ctrc 
+LEFT JOIN civicrm_contact cont ON (ctrc.contact_id = cont.id) 
+LEFT JOIN civicrm_option_value opva ON (ctrc.payment_instrument_id = opva.value) 
+LEFT JOIN civicrm_option_group opgr ON (opgr.id = opva.option_group_id) 
+LEFT JOIN civicrm_sd_refresh csd ON csd.reference_number = ctrc.trxn_id 
+WHERE opgr.name = 'payment_instrument' 
+AND   opva.label = 'Direct Debit' 
+AND   csd.id IS NULL LIMIT 100";
+
       $dao = CRM_Core_DAO::executeQuery( $sql );
 
       while ($dao->fetch()) {
