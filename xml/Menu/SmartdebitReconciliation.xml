@@ -13,15 +13,13 @@
   <item>
     <path>civicrm/smartdebit/reconciliation/fixmissingcivi</path>
     <page_callback>CRM_SmartdebitReconciliation_Form_MembershipRecurDetails</page_callback>
-    <title>Select Contact Membership and Contribution Recur</title>
     <access_arguments>administer CiviCRM</access_arguments>
     <page_type>0</page_type>
     <component>Contact</component>
   </item>
   <item>
     <path>civicrm/smartdebit/reconciliation/fix-contact-rec-confirm</path>
-    <page_callback>CRM_SmartdebitReconciliation_Page_MembershipRecurDetails</page_callback>
-    <title>View Contact Details</title>
+    <page_callback>CRM_SmartdebitReconciliation_Form_MembershipRecurDetailsConfirm</page_callback>
     <access_arguments>administer CiviCRM</access_arguments>
     <page_type>0</page_type>
     <component>Contact</component>

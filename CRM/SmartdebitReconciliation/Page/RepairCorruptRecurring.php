@@ -1,8 +1,6 @@
 <?php
 
-require_once 'CRM/SmartdebitReconciliation/Page/MembershipRecurDetails.php';
-
-Class CRM_SmartdebitReconciliation_Page_RepairCorruptRecurring extends CRM_Core_Page {
+class CRM_SmartdebitReconciliation_Page_RepairCorruptRecurring extends CRM_Core_Page {
 
   function run() {
     // Get parameters

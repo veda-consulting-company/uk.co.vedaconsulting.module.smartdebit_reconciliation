@@ -1,5 +1,8 @@
-<h3>{ts}Contact Membership and Contribution Recur{/ts}</h3>
+<h3>{ts}Contact Membership and Recurring Contribution Details{/ts}</h3>
 <div class="crm-form-block">
+  <div class="crm-submit-buttons">
+    {include file="CRM/common/formButtons.tpl" location="top"}
+  </div>
   <table class="crm-info-panel">
     <tr>
       <td>

@@ -10,13 +10,13 @@ class CRM_SmartdebitReconciliation_Form_MembershipRecurDetails extends CRM_Core_
   public function buildQuickForm() {
     $this->addElement( 'select'
       , 'membership_record'
-      , ts('Select Membership')
+      , ts('Membership')
       , array( '' => ts('Loading...'))
     );
 
     $this->addElement( 'select'
       , 'contribution_recur_record'
-      , ts('Select Recur Record')
+      , ts('Recurring Contribution')
       , array( '' => ts('Loading...'))
     );
 
@@ -27,13 +27,11 @@ class CRM_SmartdebitReconciliation_Form_MembershipRecurDetails extends CRM_Core_
     ));
     $this->addElement('hidden', 'cid', 'cid');
     $this->addElement('text', 'reference_number', 'Smart Debit Reference', array('size' => 50, 'maxlength' => 255));
-    $this->addButtons( array(
-        array(
-          'type'      => 'upload',
-          'name'      => ts('Next'),
-        ),
-      )
-    );
+    $buttons[] = array(
+      'type' => 'next',
+      'name' => ts('Continue'));
+    $this->addButtons($buttons);
+
     // Get the smart Debit mandate details
     if (CRM_Utils_Array::value('reference_number', $_GET)) {
       $smartDebitResponse = CRM_DirectDebit_Sync::getSmartDebitPayerContactDetails(CRM_Utils_Array::value('reference_number', $_GET));
@@ -58,10 +56,12 @@ class CRM_SmartdebitReconciliation_Form_MembershipRecurDetails extends CRM_Core_
     $this->assign('cid', $cid);
     $this->addFormRule(array('CRM_SmartdebitReconciliation_Form_MembershipRecurDetails', 'formRule'), $this);
 
+    CRM_Utils_System::setTitle('Select Contact Membership and Recurring Contribution');
+
     parent::buildQuickForm();
   }
 
-  public function formRule($params, $files, $self) {
+  public function formRule($params) {
     $errors = array();
     // Check end date greater than start date
     if (empty($params['cid'])) {

@@ -1,5 +1,12 @@
-<h3>{ts}View Contact Details, Membership and Contribution Recur{/ts}</h3>
+<h3>{ts}Contact Membership and Recurring Contribution Details{/ts}</h3>
 <div class="crm-form-block">
+  <div class="crm-submit-buttons">
+    {include file="CRM/common/formButtons.tpl" location="top"}
+  </div>
+  {$form.reference_number.html}
+  {$form.cid.html}
+  {$form.mid.html}
+  {$form.cr_id.html}
   <table class="crm-info-panel">
     <tr>
       <td width="30%">
@@ -75,7 +82,7 @@
     {if !empty($aContributionRecur)}
       <tr>
         <td>
-          <strong>Contribution Recur:</strong>
+          <strong>Recurring Contribution:</strong>
         </td>
         <td></td>
       </tr>
@@ -103,16 +110,16 @@
           {$aContributionRecur.payment_processor} <br />
         </td>
       </tr>
+    {else}
+      <tr>
+        <td>
+          <strong>Recurring Contribution:</strong>
+        </td>
+        <td><strong>A new recurring contribution will be created</strong></td>
+      </tr>
     {/if}
   </table>
-
-</div>
-<div>
-  {assign var=aMembershipId value=$aMembership.id}
-  {assign var=aContactId value=$aContact.id}
-  {assign var=aContributionRecurId value=$aContributionRecur.id}
-  {capture assign=crmURL}{crmURL p='civicrm/smartdebit/reconciliation/fix-contact-rec' q="cid=$aContactId&mid=$aMembershipId&cr_id=$aContributionRecurId&reference_number=$reference_number"}{/capture}
-  <span class="crm-button crm-button-type-upload crm-button_qf_ContactDetails_upload">
-  <input type="submit" name="submit" value="Submit" onclick="parent.location='{$crmURL}'"/>
-    </span>
+  <div class="crm-submit-buttons">
+    {include file="CRM/common/formButtons.tpl" location="bottom"}
+  </div>
 </div>
