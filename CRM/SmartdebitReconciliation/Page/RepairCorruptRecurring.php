@@ -5,25 +5,26 @@ require_once 'CRM/SmartdebitReconciliation/Page/MembershipRecurDetails.php';
 Class CRM_SmartdebitReconciliation_Page_RepairCorruptRecurring extends CRM_Core_Page {
 
   function run() {
-    $get = $_GET;
-    $cid = $get['cid'];
-    $payer_reference = $get['reference_number'];
-    $this->assign('payer_reference', $payer_reference);
-
-    $params = array();
-
-    // Find a membership for the contact - if they have more than one then bomb out
-    $mid = $get['mid'];
+    // Get parameters
+    $cid = CRM_Utils_Array::value('cid', $_GET);
+    $payer_reference = CRM_Utils_Array::value('reference_number', $_GET);
+    // Find a membershipType for the contact - if they have more than one then bomb out
+    $mid = CRM_Utils_Array::value('mid', $_GET);
 
     // Find recurring for the contact
     // The recurring should have the a status of pending
-    $cr_id = $get['cr_id'];
+    $cr_id = CRM_Utils_Array::value('cr_id', $_GET);
+
+    // Assign values to form
+    $this->assign('payer_reference', $payer_reference);
+
+    // Initialise values
+    $params = array();
 
     // Find the contribution attached to the recurring record thats also set to pending (incomplete transaction)
-
     if(!empty($cid)){
-      $contact = CRM_SmartdebitReconciliation_Utils::_get_contact_details($cid);
-      $address = CRM_SmartdebitReconciliation_Utils::_get_address($cid);
+      $contact = CRM_SmartdebitReconciliation_Utils::getContactDetails($cid);
+      $address = CRM_SmartdebitReconciliation_Utils::getContactAddress($cid);
       $this->assign('aContact', $contact);
       $this->assign('aAddress', $address);
 
@@ -31,13 +32,13 @@ Class CRM_SmartdebitReconciliation_Page_RepairCorruptRecurring extends CRM_Core_
     }
 
     if(!empty($mid)){
-      $membership = CRM_SmartdebitReconciliation_Utils::_get_membership_type($mid);
-      $this->assign('aMembership', $membership);
+      $membershipType = CRM_Member_PseudoConstant::membershipType($mid);
+      $this->assign('aMembership', $membershipType);
       $params['membership_id'] = $mid;
     }
 
     if(!empty($cr_id)){
-      $cRecur = CRM_SmartdebitReconciliation_Utils::_get_contribution_recur($cr_id);
+      $cRecur = CRM_SmartdebitReconciliation_Utils::getRecurringContributionRecord($cr_id);
       $this->assign('aContributionRecur', $cRecur);
       $params['contribution_recur_id'] = $cr_id;
     }

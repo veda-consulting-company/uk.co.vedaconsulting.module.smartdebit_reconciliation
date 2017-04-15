@@ -8,8 +8,8 @@ class CRM_SmartdebitReconciliation_Page_AJAX
     if (empty($selectedContact)) {
       return;
     }
-    $membership = CRM_SmartdebitReconciliation_Utils::get_membership( $selectedContact );
-    $cRecur     = CRM_SmartdebitReconciliation_Utils::get_Recurring_Record( $selectedContact );
+    $membership = CRM_SmartdebitReconciliation_Utils::getContactMemberships($selectedContact);
+    $cRecur     = CRM_SmartdebitReconciliation_Utils::getContactRecurringContributions($selectedContact);
     $nullMembership = array( 0 => 'No Membership Found');
     $nullcRecur = array( 0 => 'No Contribution Recur Found');
     $options['membership'] = $membership ? $membership : $nullMembership;
@@ -32,7 +32,7 @@ class CRM_SmartdebitReconciliation_Page_AJAX
         $membershipWithRecur [] = $membership['contribution_recur_id'];
       }
     }
-    $allRecurringRecords = $originalAllRecurringRecords = CRM_SmartdebitReconciliation_Utils::get_Recurring_Record($selectedContact);
+    $allRecurringRecords = $originalAllRecurringRecords = CRM_SmartdebitReconciliation_Utils::getContactRecurringContributions($selectedContact);
     foreach ($membershipWithRecur as $linkedRecur) {
       if(array_key_exists($linkedRecur, $allRecurringRecords)) {
         unset($allRecurringRecords[$linkedRecur]);

@@ -1,29 +1,30 @@
 <?php
 
 class CRM_SmartdebitReconciliation_Page_MembershipRecurDetails extends CRM_Core_Page {
-  // Path: civicrm/smartdebit/reconciliation/fixmissingcivi
+  // Path: civicrm/smartdebit/reconciliation/fix-contact-rec-confirm
 
   public function run() {
-    $get = $_GET;
-    $cid = $get['cid'];
-    $mid = $get['mid'];
-    $cr_id = $get['cr_id'];
-    $reference_number = $get['reference_number'];
+    // Get parameters
+    $cid = CRM_Utils_Array::value('cid', $_GET);
+    $mid = CRM_Utils_Array::value('mid', $_GET);
+    $cr_id = CRM_Utils_Array::value('cr_id', $_GET);
+    $reference_number = CRM_Utils_Array::value('reference_number', $_GET);
     $this->assign('reference_number', $reference_number);
+    // Get contact details if set
     if(!empty($cid)){
-      $contact = CRM_SmartdebitReconciliation_Utils::_get_contact_details($cid);
-      $address = CRM_SmartdebitReconciliation_Utils::_get_address($cid);
+      $contact = CRM_SmartdebitReconciliation_Utils::getContactDetails($cid);
+      $address = CRM_SmartdebitReconciliation_Utils::getContactAddress($cid);
       $this->assign('aContact', $contact);
       $this->assign('aAddress', $address);
     }
     // If 'Donation' option is chosen for membership, don't process
     if(!empty($mid) && $mid != 'donation') {
-      $membership = CRM_SmartdebitReconciliation_Utils::get_membership($cid, $mid);
+      $membership = CRM_SmartdebitReconciliation_Utils::getContactMemberships($cid, $mid);
       $this->assign('aMembership', $membership);
     }
     // If 'Create New Recurring' option is chosen for recurring, don't process
     if(!empty($cr_id) && $cr_id != 'new_recur') {
-      $cRecur = CRM_SmartdebitReconciliation_Utils::_get_contribution_recur($cr_id);
+      $cRecur = CRM_SmartdebitReconciliation_Utils::getRecurringContributionRecord($cr_id);
       $this->assign('aContributionRecur', $cRecur);
     }
     parent::run();
