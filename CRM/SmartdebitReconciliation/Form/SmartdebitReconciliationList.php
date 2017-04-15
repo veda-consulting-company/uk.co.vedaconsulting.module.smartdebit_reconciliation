@@ -34,8 +34,6 @@
  *
  */
 
-require_once 'CRM/Core/Form.php';
-require_once 'CRM/Core/Session.php';
 /**
  * This class provides the functionality to delete a group of
  * contacts. This class provides functionality for the actual
@@ -68,7 +66,7 @@ class CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList extends CRM
    * @access public
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     // For smart debit sync purpose
     $sync = CRM_Utils_Array::value('sync', $_GET, '');
     $this->assign('sync', $sync);
@@ -357,16 +355,23 @@ AND   csd.id IS NULL LIMIT 100";
     CRM_Utils_System::setTitle('Smart Debit Reconciliation');
   }
 
+  /**
+   * @param $amount
+   * @return mixed
+   */
   static function getCleanSmartDebitAmount($amount) {
     $numeric_filtered = filter_var($amount, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
     return($numeric_filtered);
   }
 
-  /* This function is used when there is a pending recur record and a incomplete transaction
+  /**
+   * This function is used when there is a pending recur record and a incomplete transaction
    * This situation normally arises when the callback to the IPN failed or something
    * The code was pulled from the PostProcess hook code in the Direct Debit extension removing anything unecessary
+   *
+   * @param $params
    */
-  function repair_corrupt_in_civicrm_record($params) {
+  static function repair_corrupt_in_civicrm_record($params) {
     CRM_Core_Error::debug_log_message('SmartDebitReconciliation_repair_corrupt_in_civicrm_record: Not implemented');
     return;
     // FIXME: There are too many undefined vars etc here so disabled until someone has time to fix!
@@ -424,7 +429,7 @@ AND   csd.id IS NULL LIMIT 100";
     renew_membership_by_one_period($membershipID);
   }
 
-  /*
+  /**
    * This is the main controlling function for fixing reconciliation records
    * Three possibilities
    *  1. Membership Not Selected, Recurring Not Selected
@@ -435,6 +440,8 @@ AND   csd.id IS NULL LIMIT 100";
    *     - Fix the recurring Record and link the membership and recurring
    *
    * In All cases the recurring details are taken from Smart Debit so its crucial this is correct first
+   *
+   * @param $params
    */
   static function repair_missing_from_civicrm_record($params) {
     foreach (array(
@@ -553,7 +560,7 @@ AND   csd.id IS NULL LIMIT 100";
    * This is used when we need to create a new recurring record
    * @param $params
    */
-  function create_recur(&$params) {
+  static function create_recur(&$params) {
     foreach (array(
                'contact_id',
                'recur_frequency_interval',
@@ -615,7 +622,7 @@ AND   csd.id IS NULL LIMIT 100";
    * This is used when we need to create a linked mem
    * @param $params
    */
-  function link_membership_to_recur(&$params) {
+  static function link_membership_to_recur(&$params) {
     foreach (array(
                'contact_id',
                'membership_id',
@@ -730,6 +737,12 @@ AND   csd.id IS NULL LIMIT 100";
     return $mandateFetchedCount;
   }
 
+  /**
+   * @param $array
+   * @param $field
+   * @param $value
+   * @return mixed
+   */
   static function getArrayFieldValue($array, $field, $value) {
     if (!isset($array[$field])) {
       return $value;
@@ -744,8 +757,7 @@ AND   csd.id IS NULL LIMIT 100";
    * @param $sdStatus
    * @return string
    */
-  static function formatSDStatus($sdStatus)
-  {
+  static function formatSDStatus($sdStatus) {
     switch ($sdStatus) {
       case 0: // Draft
         return 'Draft';

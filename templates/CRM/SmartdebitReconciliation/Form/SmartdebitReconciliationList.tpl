@@ -63,44 +63,44 @@
             <td><b>{ts}Status{/ts}</td>
             <td></td>
         </tr>
-        {foreach from=$listArray item=row}
-            {assign var=id value=$row.id}
-            {assign var=rContactId value=$row.contact_id}
-            {assign var=rContributionRecurId value=$row.contribution_recur_id}
-            {capture assign=recurContributionViewURL}{crmURL p='civicrm/contact/view/contributionrecur' q="reset=1&id=$rContributionRecurId&cid=$rContactId"}{/capture}
-            {capture assign=contactViewURL}{crmURL p='civicrm/contact/view' q="reset=1&cid=$rContactId"}{/capture}
-            <tr class="{cycle values="odd-row,even-row"}">
-                <td>
-                    {if $row.contribution_recur_id }
-                        <a href="{$recurContributionViewURL}">{$row.transaction_id}</a>
-                    {else}
-                        {$row.transaction_id}
-                    {/if}
-                </td>
-                <td>
-                    {if $row.contact_id gt 0}
-                        <a href="{$contactViewURL}">{$row.contact_name}</a>
-                    {else}
-                        {$row.contact_name} ({$row.sd_contact_id})
-                    {/if}
-                </td>
-                <td>{$row.differences}</td>
+      {foreach from=$listArray item=row}
+        {assign var=id value=$row.id}
+        {assign var=rContactId value=$row.contact_id}
+        {assign var=rContributionRecurId value=$row.contribution_recur_id}
+        {capture assign=recurContributionViewURL}{crmURL p='civicrm/contact/view/contributionrecur' q="reset=1&id=$rContributionRecurId&cid=$rContactId"}{/capture}
+        {capture assign=contactViewURL}{crmURL p='civicrm/contact/view' q="reset=1&cid=$rContactId"}{/capture}
+          <tr class="{cycle values="odd-row,even-row"}">
+              <td>
                 {if $row.contribution_recur_id }
-                    <td>{$row.frequency}/{$row.sd_frequency}</td>
-                    <td>{$row.amount}/{$row.sd_amount}</td>
-                    <td>{$row.contribution_status_id}/{$row.sd_contribution_status_id}</td>
+                    <a href="{$recurContributionViewURL}">{$row.transaction_id}</a>
                 {else}
-                    <td>{$row.sd_frequency_factor} {$row.sd_frequency_type}</td>
-                    <td>{$row.sd_amount}</td>
-                    <td>{$row.sd_contribution_status_id}</td>
+                  {$row.transaction_id}
                 {/if}
-                <td>
-                    {if $row.fix_me_url}
-                        <a href="{$row.fix_me_url}" target="_new">Fix Me</a>
-                    {/if}
-                </td>
-            </tr>
-        {/foreach}
+              </td>
+              <td>
+                {if $row.contact_id gt 0}
+                    <a href="{$contactViewURL}">{$row.contact_name}</a>
+                {else}
+                  {$row.contact_name} ({$row.sd_contact_id})
+                {/if}
+              </td>
+              <td>{$row.differences}</td>
+            {if $row.contribution_recur_id }
+                <td>{$row.frequency}/{$row.sd_frequency}</td>
+                <td>{$row.amount}/{$row.sd_amount}</td>
+                <td>{$row.contribution_status_id}/{$row.sd_contribution_status_id}</td>
+            {else}
+                <td>{$row.sd_frequency_factor} {$row.sd_frequency_type}</td>
+                <td>{$row.sd_amount}</td>
+                <td>{$row.sd_contribution_status_id}</td>
+            {/if}
+              <td>
+                {if $row.fix_me_url}
+                    <a href="{$row.fix_me_url}" target="_new">Fix Me</a>
+                {/if}
+              </td>
+          </tr>
+      {/foreach}
     </table>
 </div>
 
