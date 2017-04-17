@@ -77,7 +77,7 @@ cj(function() {
         var selected_contact_id = fn_find_selected_contact_id( iCheckedRow.attr('id') );
         var oContributionDet    = fn_get_recur_contribution_details( selected_contact_id );
         if ( oContributionDet == false ) {
-          alert( 'This Member does not have a Recuring Contribution.');
+          alert( 'This Member does not have a Recurring Contribution.');
         } else {
           var iOldDdAmount = oContributionDet.amount;
           var iNewDdAmount = prompt("Enter new DD Amount");
