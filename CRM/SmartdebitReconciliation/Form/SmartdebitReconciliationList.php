@@ -365,71 +365,6 @@ AND   csd.id IS NULL LIMIT 100";
   }
 
   /**
-   * This function is used when there is a pending recur record and a incomplete transaction
-   * This situation normally arises when the callback to the IPN failed or something
-   * The code was pulled from the PostProcess hook code in the Direct Debit extension removing anything unecessary
-   *
-   * @param $params
-   */
-  static function repair_corrupt_in_civicrm_record($params) {
-    CRM_Core_Error::debug_log_message('SmartDebitReconciliation_repair_corrupt_in_civicrm_record: Not implemented');
-    return;
-    // FIXME: There are too many undefined vars etc here so disabled until someone has time to fix!
-    $aContribValue  = array();
-    $aContribParam  = array( 'contact_id' => $params['contact_id'] );
-    $aContribReturn = array( 'id'
-    , 'contribution_recur_id'
-    );
-    CRM_Core_DAO::commonRetrieve( 'CRM_Contribute_DAO_Contribution'
-      , $aContribParam
-      , $aContribValue
-      , $aContribReturn
-    );
-    $contributionID      = $aContribValue['id'];
-    $contributionRecurID = $aContribValue['contribution_recur_id'];
-    $start_date     = urlencode( $form->_params['start_date'] );
-
-    $paymentProcessorType = urlencode( $form->_paymentProcessor['payment_processor_type'] );
-    $membershipID         = urlencode( $form->_values['membership_id'] );
-    $contactID            = urlencode( $form->getVar( '_contactID' ) );
-    $invoiceID            = urlencode( $form->_params['invoiceID'] );
-    $amount               = urlencode( $form->_params['amount'] );
-    $trxn_id              = urlencode( $form->_params['trxn_id'] );
-    $collection_day       = urlencode( $form->_params['preferred_collection_day'] );
-
-    CRM_Core_Error::debug_log_message( 'paymentProcessorType='.$paymentProcessorType);
-    CRM_Core_Error::debug_log_message( 'paymentType='.$paymentType);
-    CRM_Core_Error::debug_log_message( 'membershipID='.$membershipID);
-    CRM_Core_Error::debug_log_message( 'contributionID='.$contributionID);
-    CRM_Core_Error::debug_log_message( 'contactID='.$contactID);
-    CRM_Core_Error::debug_log_message( 'invoiceID='.$invoiceID);
-    CRM_Core_Error::debug_log_message( 'amount='.$amount);
-    CRM_Core_Error::debug_log_message( 'isRecur='.$isRecur);
-    CRM_Core_Error::debug_log_message( 'trxn_id='.$trxn_id);
-    CRM_Core_Error::debug_log_message( 'start_date='.$start_date);
-    CRM_Core_Error::debug_log_message( 'collection_day='.$collection_day);
-    CRM_Core_Error::debug_log_message( 'contributionRecurID:' .$contributionRecurID );
-    CRM_Core_Error::debug_log_message( 'CIVICRM_UF_BASEURL='.CIVICRM_UF_BASEURL);
-
-    $query = "processor_name=".$paymentProcessorType."&module=contribute&contactID=".$contactID."&contributionID=".$contributionID."&membershipID=".$membershipID."&invoice=".$invoiceID."&mc_gross=".$amount."&payment_status=Completed&txn_type=recurring_payment&contributionRecurID=$contributionRecurID&txn_id=$trxn_id&first_collection_date=$start_date&collection_day=$collection_day";
-
-    // Get the recur ID for the contribution
-    $url = CRM_Utils_System::url(
-      'civicrm/payment/ipn', // $path
-      $query,
-      FALSE, // $absolute
-      NULL, // $fragment
-      FALSE, // $htmlize
-      FALSE, // $frontend
-      FALSE // $forceBackend
-    );
-
-    $url = CIVICRM_UF_BASEURL.$url;
-    call_CiviCRM_IPN($url);
-    renew_membership_by_one_period($membershipID);
-  }
-
-  /**
    * This is the main controlling function for fixing reconciliation records
    * Three possibilities
    *  1. Membership Not Selected, Recurring Not Selected
@@ -441,6 +376,7 @@ AND   csd.id IS NULL LIMIT 100";
    *
    * In All cases the recurring details are taken from Smart Debit so its crucial this is correct first
    *
+   * FIXME: This function is not used anywhere
    * @param $params
    */
   static function repair_missing_from_civicrm_record($params) {
@@ -491,6 +427,7 @@ AND   csd.id IS NULL LIMIT 100";
    * This is used when the fix process is used on the reconciliation
    * It should ensure the recur details match those of the smart debit record
    *
+   * FIXME: Not tested/used
    * @param $params
    */
   static function repair_recur(&$params) {
@@ -559,6 +496,8 @@ AND   csd.id IS NULL LIMIT 100";
   /**
    * This is used when we need to create a new recurring record
    * @param $params
+   *
+   * FIXME: not tested/used
    */
   static function create_recur(&$params) {
     foreach (array(
@@ -621,6 +560,8 @@ AND   csd.id IS NULL LIMIT 100";
   /**
    * This is used when we need to create a linked mem
    * @param $params
+   *
+   * FIXME: Not tested/used
    */
   static function link_membership_to_recur(&$params) {
     foreach (array(
