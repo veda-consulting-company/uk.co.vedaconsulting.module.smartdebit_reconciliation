@@ -98,13 +98,20 @@
   var $form = cj("form.{/literal}{$form.formClass}{literal}");
   cj("#contact_name", $form).change(function() {
       var data = cj( '#contact_name' ).select2('data');
-      var cid  = data.id;
+      var cid = null;
+      ( data !== null) ? cid = data.id : cid = null;
       cj('input[name=cid]').val(cid);
-      cj('#membership_record').parents('tr').show();
-      cj('#contribution_recur_record').parents('tr').show();
-      cj('.crm-submit-buttons').show();
-      getMembershipAndRecur(cid);
-
+      if (cid !== null) {
+          cj('#membership_record').parents('tr').show();
+          cj('#contribution_recur_record').parents('tr').show();
+          cj('.crm-submit-buttons').show();
+          getMembershipAndRecur(cid);
+      }
+      else {
+          cj('#membership_record').parents('tr').hide();
+          cj('#contribution_recur_record').parents('tr').hide();
+          cj('.crm-submit-buttons').hide();
+      }
   });
 
   function getMembershipAndRecur(cid) {

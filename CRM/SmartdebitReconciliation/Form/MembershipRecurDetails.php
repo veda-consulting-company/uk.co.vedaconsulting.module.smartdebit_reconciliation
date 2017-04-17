@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Class CRM_SmartdebitReconciliation_Form_MembershipRecurDetails
+ *
+ * Path: civicrm/smartdebit/reconciliation/fixmissingcivi
+ */
 class CRM_SmartdebitReconciliation_Form_MembershipRecurDetails extends CRM_Core_Form {
   CONST c_current_membership_status = "Current"; // MV, to set current membership as default 
 

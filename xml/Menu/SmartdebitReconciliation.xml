@@ -3,7 +3,7 @@
 <menu>
   <item>
     <path>civicrm/smartdebit/reconciliation/list</path>
-    <title>Smart Debit Reconcilliation</title>
+    <title>Smart Debit Reconciliation</title>
     <path_arguments></path_arguments>
     <page_callback>CRM_SmartdebitReconciliation_Form_SmartdebitReconciliationList</page_callback>
     <access_arguments>administer CiviCRM</access_arguments>

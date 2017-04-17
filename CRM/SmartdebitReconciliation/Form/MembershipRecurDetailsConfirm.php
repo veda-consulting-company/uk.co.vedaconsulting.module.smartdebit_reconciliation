@@ -57,7 +57,7 @@ class CRM_SmartdebitReconciliation_Form_MembershipRecurDetailsConfirm extends CR
     $reference_number = $submitValues['reference_number'];
     $cr_id = $submitValues['cr_id'];
     $params = sprintf('cid=%d&mid=%d&cr_id=%d&reference_number=%s', $cid, $mid, $cr_id, $reference_number);
-    // FIXME: This needs to redirect somewhere sensible
+    // FIXME: This path doesn't exist... need to redirect and create a recurring contribution
     $url = CRM_Utils_System::url('civicrm/smartdebit/reconciliation/fix-contact-rec',$params);
     CRM_Utils_System::redirect($url);
     parent::postProcess();
